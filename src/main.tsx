@@ -8,7 +8,5 @@ import Calendar from "./Calendar.tsx";
 createRoot(document.getElementById("root")!).render(
   <StrictMode>
     <App />
-    {/* <Calendar /> */}
-    {/* <Detail /> */}
   </StrictMode>
 );

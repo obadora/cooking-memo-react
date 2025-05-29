@@ -1,23 +1,9 @@
 import React, { useState } from "react";
 import { ChevronLeft, ChevronRight } from "lucide-react";
-
-// Tailwind CSS CDNを読み込み
-if (
-  typeof document !== "undefined" &&
-  !document.querySelector("#tailwind-cdn")
-) {
-  const link = document.createElement("link");
-  link.id = "tailwind-cdn";
-  link.rel = "stylesheet";
-  link.href =
-    "https://cdnjs.cloudflare.com/ajax/libs/tailwindcss/2.2.19/tailwind.min.css";
-  document.head.appendChild(link);
-}
-
-interface CalendarProps {
+type CalendarProps = {
   onDateSelect?: (date: Date) => void;
   selectedDate?: Date;
-}
+};
 
 const Calendar: React.FC<CalendarProps> = ({ onDateSelect, selectedDate }) => {
   const [currentDate, setCurrentDate] = useState<Date>(new Date());
@@ -84,6 +70,31 @@ const Calendar: React.FC<CalendarProps> = ({ onDateSelect, selectedDate }) => {
       date.getMonth() === selectedDate.getMonth() &&
       date.getDate() === selectedDate.getDate()
     );
+  };
+
+  // クラス名を決定する関数
+  const getDateClassName = (
+    dateInfo: { day: number; isCurrentMonth: boolean; date: Date },
+    index: number
+  ): string => {
+    let className = "text-sm flex items-center justify-center ";
+
+    if (isSelected(dateInfo.date)) {
+      className += "font-bold text-blue-600";
+    } else if (isToday(dateInfo.date)) {
+      className +=
+        "font-bold text-blue-600 bg-blue-100 rounded-full w-6 h-6 text-xs";
+    } else if (!dateInfo.isCurrentMonth) {
+      className += "text-gray-400 font-medium";
+    } else if (index % 7 === 0) {
+      className += "text-red-500 font-medium";
+    } else if (index % 7 === 6) {
+      className += "text-blue-500 font-medium";
+    } else {
+      className += "text-gray-700 font-medium";
+    }
+
+    return className;
   };
 
   // カレンダーの日付配列を生成
@@ -221,24 +232,7 @@ const Calendar: React.FC<CalendarProps> = ({ onDateSelect, selectedDate }) => {
           >
             {/* 日付表示 */}
             <div className="flex justify-between items-start mb-1">
-              <span
-                className={`
-                  text-sm flex items-center justify-center
-                  ${
-                    isSelected(dateInfo.date)
-                      ? "font-bold text-blue-600"
-                      : isToday(dateInfo.date)
-                      ? "font-bold text-blue-600 bg-blue-100 rounded-full w-6 h-6 text-xs"
-                      : !dateInfo.isCurrentMonth
-                      ? "text-gray-400 font-medium"
-                      : index % 7 === 0
-                      ? "text-red-500 font-medium"
-                      : index % 7 === 6
-                      ? "text-blue-500 font-medium"
-                      : "text-gray-700 font-medium"
-                  }
-                `}
-              >
+              <span className={getDateClassName(dateInfo, index)}>
                 {dateInfo.day}
               </span>
             </div>
@@ -248,11 +242,6 @@ const Calendar: React.FC<CalendarProps> = ({ onDateSelect, selectedDate }) => {
               {/* サンプルのスケジュール項目（現在月のみ表示） */}
               {dateInfo.isCurrentMonth && (
                 <>
-                  {isSelected(dateInfo.date) && (
-                    <div className="text-xs bg-blue-100 text-blue-800 px-1 py-0.5 rounded truncate">
-                      選択中
-                    </div>
-                  )}
                   {isToday(dateInfo.date) && (
                     <div className="text-xs bg-green-100 text-green-800 px-1 py-0.5 rounded truncate">
                       今日
@@ -264,44 +253,8 @@ const Calendar: React.FC<CalendarProps> = ({ onDateSelect, selectedDate }) => {
           </div>
         ))}
       </div>
-
-      {/* 選択された日付の表示
-      {selectedDate && (
-        <div className="mt-4 p-3 bg-gray-50 rounded-md text-center flex-shrink-0">
-          <p className="text-sm text-gray-600 mb-1">選択した日付:</p>
-          <p className="text-lg font-semibold text-gray-700">
-            {selectedDate.getFullYear()}年{selectedDate.getMonth() + 1}月
-            {selectedDate.getDate()}日
-          </p>
-        </div>
-      )} */}
     </div>
   );
 };
 
-// 使用例のコンポーネント
-const CalendarApp: React.FC = () => {
-  const [selectedDate, setSelectedDate] = useState<Date | undefined>(undefined);
-
-  const handleDateSelect = (date: Date): void => {
-    setSelectedDate(date);
-  };
-
-  return (
-    <div className="h-screen bg-gray-100 p-4 flex flex-col">
-      <div className="flex-1 flex flex-col">
-        <h1 className="text-3xl font-bold text-center text-gray-700 mb-4 flex-shrink-0">
-          Reactカレンダー
-        </h1>
-        <div className="flex-1">
-          <Calendar
-            onDateSelect={handleDateSelect}
-            selectedDate={selectedDate}
-          />
-        </div>
-      </div>
-    </div>
-  );
-};
-
-export default CalendarApp;
+export default Calendar;

@@ -1,10 +1,32 @@
 import React, { useEffect, useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
+// import { Recipe } from "./types/recipe";
+
+interface RecipeIngredient {
+  name: string;
+  quantity?: string;
+  unit?: string;
+}
+
+interface RecipeStep {
+  instruction: string;
+  step_number?: number;
+  time_estimate?: number;
+}
+
+interface RecipePhoto {
+  photo_url: string;
+}
 
 interface RecipeData {
   title: string;
-  ingredients: string[];
-  steps: string[];
+  description?: string;
+  ingredients: RecipeIngredient[]; // オブジェクトの配列に変更
+  steps: RecipeStep[]; // オブジェクトの配列に変更
+  cook_time?: number;
+  servings?: number;
+  source_url?: string;
+  recipe_photos: RecipePhoto[];
 }
 
 const RecipePage = () => {
@@ -16,13 +38,12 @@ const RecipePage = () => {
   // URL送信ハンドラ
   const handleUrlSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    console.log("inputUrl", inputUrl);
     if (!inputUrl) return;
     try {
-      const response = await fetch("http://localhost:8000/scrape", {
+      const response = await fetch("http://localhost:8000/recipe/scrape", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ url: inputUrl }),
+        body: JSON.stringify({ source_url: inputUrl }),
       });
       const data = await response.json();
       setRecipeData(data);
@@ -90,13 +111,21 @@ const RecipePage = () => {
           </button>
           {recipeData && (
             <div className="bg-white rounded-lg shadow-lg p-6">
+              {/* 画像をタイトルの上に表示 */}
+              {recipeData?.recipe_photos && (
+                <img
+                  src={recipeData.recipe_photos[0].photo_url}
+                  alt={recipeData.title}
+                  className="mx-auto mb-4 rounded shadow max-h-64 object-contain"
+                />
+              )}
               <h2 className="text-2xl font-bold mb-4">{recipeData.title}</h2>
               <div className="mb-6">
                 <h3 className="text-xl font-semibold mb-2">材料</h3>
                 <ul className="list-disc list-inside space-y-1">
                   {recipeData.ingredients.map((ingredient, index) => (
                     <li key={index} className="text-gray-700">
-                      {ingredient}
+                      {ingredient.name}
                     </li>
                   ))}
                 </ul>
@@ -106,7 +135,7 @@ const RecipePage = () => {
                 <ol className="list-decimal list-inside space-y-2">
                   {recipeData.steps.map((step, index) => (
                     <li key={index} className="text-gray-700">
-                      {step}
+                      {step.instruction}
                     </li>
                   ))}
                 </ol>

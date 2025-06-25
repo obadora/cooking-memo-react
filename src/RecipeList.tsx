@@ -30,7 +30,7 @@ interface RecipeData {
 }
 
 const RecipePage = () => {
-  const [recipeData, setRecipeData] = useState<RecipeData | null>(null);
+  const [recipes, setRecipes] = useState<RecipeData[]>([]);
   const [inputUrl, setInputUrl] = useState<string>("");
   const { date } = useParams<{ date: string }>();
   const navigate = useNavigate();
@@ -43,10 +43,11 @@ const RecipePage = () => {
       const response = await fetch("http://localhost:8000/recipe/scrape", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ source_url: inputUrl }),
+        body: JSON.stringify({ source_url: inputUrl, cooking_date: date }),
       });
       const data = await response.json();
-      setRecipeData(data);
+      setRecipes(prev => [...prev, data]);
+      setInputUrl("");
     } catch (error) {
       console.error("Error fetching data:", error);
     }
@@ -70,14 +71,34 @@ const RecipePage = () => {
     return `${date.getFullYear()}年${date.getMonth() + 1}月${date.getDate()}日`;
   };
 
-  if (!recipeData) {
-    // return (
-    //   <div className="h-screen bg-gray-100 p-4 flex items-center justify-center">
-    //     <div className="text-lg">Loading...</div>
-    //   </div>
-    // );
-  }
+  const handleRecipeClick = (recipe: RecipeData) => {
+    navigate(`/recipe/${date}/detail`, { state: { recipe } });
+  };
 
+  // 日付のレシピを取得する関数
+  const fetchRecipesForDate = async (cookingDate: string) => {
+    try {
+      const response = await fetch(`http://localhost:8000/recipes/date/${cookingDate}`);
+      if (response.ok) {
+        const data = await response.json();
+        setRecipes(data);
+      } else {
+        console.error("Failed to fetch recipes for date:", cookingDate);
+        setRecipes([]);
+      }
+    } catch (error) {
+      console.error("Error fetching recipes for date:", error);
+      setRecipes([]);
+    }
+  };
+
+  // 日付が変更された時にレシピを取得
+  useEffect(() => {
+    if (date) {
+      fetchRecipesForDate(date);
+    }
+  }, [date]);
+  // const recipes = getDayRecipes(selectedDate);
   return (
     <div className="h-screen bg-gray-100 p-4 flex flex-col">
       <form
@@ -109,37 +130,38 @@ const RecipePage = () => {
           >
             ← カレンダーに戻る
           </button>
-          {recipeData && (
-            <div className="bg-white rounded-lg shadow-lg p-6">
-              {/* 画像をタイトルの上に表示 */}
-              {recipeData?.recipe_photos && (
-                <img
-                  src={recipeData.recipe_photos[0].photo_url}
-                  alt={recipeData.title}
-                  className="mx-auto mb-4 rounded shadow max-h-64 object-contain"
-                />
-              )}
-              <h2 className="text-2xl font-bold mb-4">{recipeData.title}</h2>
-              <div className="mb-6">
-                <h3 className="text-xl font-semibold mb-2">材料</h3>
-                <ul className="list-disc list-inside space-y-1">
-                  {recipeData.ingredients.map((ingredient, index) => (
-                    <li key={index} className="text-gray-700">
-                      {ingredient.name}
-                    </li>
-                  ))}
-                </ul>
-              </div>
-              <div>
-                <h3 className="text-xl font-semibold mb-2">手順</h3>
-                <ol className="list-decimal list-inside space-y-2">
-                  {recipeData.steps.map((step, index) => (
-                    <li key={index} className="text-gray-700">
-                      {step.instruction}
-                    </li>
-                  ))}
-                </ol>
-              </div>
+          {recipes.length > 0 ? (
+            <div className="grid grid-cols-3 gap-4">
+              {recipes.map((recipe, index) => (
+                <div
+                  key={index}
+                  onClick={() => handleRecipeClick(recipe)}
+                  className="bg-white rounded-lg shadow-lg overflow-hidden cursor-pointer hover:shadow-xl transition-shadow aspect-square"
+                >
+                  <div className="h-3/4 overflow-hidden">
+                    {recipe.recipe_photos && recipe.recipe_photos.length > 0 ? (
+                      <img
+                        src={recipe.recipe_photos[0].photo_url}
+                        alt={recipe.title}
+                        className="w-full h-full object-cover"
+                      />
+                    ) : (
+                      <div className="w-full h-full bg-gray-200 flex items-center justify-center">
+                        <span className="text-gray-500">画像なし</span>
+                      </div>
+                    )}
+                  </div>
+                  <div className="h-1/4 p-3 flex items-center">
+                    <h3 className="text-sm font-semibold line-clamp-2 text-gray-800">
+                      {recipe.title}
+                    </h3>
+                  </div>
+                </div>
+              ))}
+            </div>
+          ) : (
+            <div className="text-center text-gray-500 mt-8">
+              <p>レシピのURLを入力してレシピを追加してください</p>
             </div>
           )}
         </div>

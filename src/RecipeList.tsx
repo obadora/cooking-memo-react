@@ -103,7 +103,7 @@ const RecipePage = () => {
   }, [date]);
   // const recipes = getDayRecipes(selectedDate);
   return (
-    <div className="h-screen bg-gray-100 p-4 flex flex-col">
+    <div className="min-h-screen bg-gray-100 p-4 flex flex-col">
       <form
         onSubmit={handleUrlSubmit}
         className="mb-4 flex gap-2 max-w-2xl mx-auto w-full"

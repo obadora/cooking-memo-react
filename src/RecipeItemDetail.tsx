@@ -17,6 +17,10 @@ interface RecipePhoto {
   photo_url: string;
 }
 
+interface SourceTypes {
+  id: number;
+  name: string;
+}
 interface RecipeData {
   id?: number;
   title: string;
@@ -26,6 +30,7 @@ interface RecipeData {
   cook_time?: number;
   servings?: number;
   source_url?: string;
+  source_type_id: number;
   recipe_photos: RecipePhoto[];
 }
 
@@ -51,10 +56,14 @@ const RecipeItemDetail = () => {
 
   const fetchCookingDates = async (recipeId: number) => {
     try {
-      const response = await fetch(`http://localhost:8000/recipe/${recipeId}/cooking-dates`);
+      const response = await fetch(
+        `http://localhost:8000/recipe/${recipeId}/cooking-dates`
+      );
       if (response.ok) {
         const data = await response.json();
-        setCookingDates(data.map((record: CookingRecord) => record.cooking_date));
+        setCookingDates(
+          data.map((record: CookingRecord) => record.cooking_date)
+        );
       }
     } catch (error) {
       console.error("Error fetching cooking dates:", error);
@@ -79,9 +88,12 @@ const RecipeItemDetail = () => {
     if (!recipeData?.id) return;
 
     try {
-      const response = await fetch(`http://localhost:8000/recipe/${recipeData.id}`, {
-        method: "DELETE",
-      });
+      const response = await fetch(
+        `http://localhost:8000/recipe/${recipeData.id}`,
+        {
+          method: "DELETE",
+        }
+      );
 
       if (response.ok) {
         setShowDeleteConfirm(false);
@@ -108,17 +120,17 @@ const RecipeItemDetail = () => {
 
   if (!recipeData) {
     return (
-      <div className="h-screen bg-gray-100 p-4 flex items-center justify-center">
+      <div className="min-h-screen bg-gray-100 p-4 flex items-center justify-center">
         <div className="text-lg">レシピデータがありません</div>
       </div>
     );
   }
 
   return (
-    <div className="h-screen bg-gray-100 p-4 flex flex-col">
+    <div className="min-h-screen bg-gray-100 p-4 flex flex-col">
       <div className="flex-1 flex flex-col">
         <h1 className="text-3xl font-bold text-center text-gray-700 mb-4 flex-shrink-0">
-          {formatDate(date)}のレシピ詳細
+          レシピ詳細
         </h1>
         <div className="flex-1 max-w-4xl mx-auto w-full">
           <div className="mb-4 flex gap-2">
@@ -146,6 +158,23 @@ const RecipeItemDetail = () => {
               )}
             <h2 className="text-2xl font-bold mb-4">{recipeData.title}</h2>
             <div className="mb-6">
+              {recipeData.source_type_id === 1 && recipeData.source_url ? (
+                <div className="mb-4 p-3 bg-gray-50 rounded-lg">
+                  <p className="text-sm text-gray-600 mb-1">参照元URL:</p>
+                  <a
+                    href={recipeData.source_url}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="text-blue-600 hover:text-blue-800 text-sm break-all underline"
+                  >
+                    {recipeData.source_url}
+                  </a>
+                </div>
+              ) : (
+                <div className="mb-4 p-3 bg-gray-50 rounded-lg">
+                  <p className="text-sm text-gray-600">レシピ本の情報です</p>
+                </div>
+              )}
               <h3 className="text-xl font-semibold mb-2">材料</h3>
               <ul className="list-disc list-inside space-y-1">
                 {recipeData.ingredients.map((ingredient, index) => (

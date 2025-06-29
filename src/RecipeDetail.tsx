@@ -19,6 +19,7 @@ interface RecipePhoto {
 }
 
 interface RecipeData {
+  id?: number;
   title: string;
   description?: string;
   ingredients: RecipeIngredient[]; // オブジェクトの配列に変更
@@ -31,6 +32,7 @@ interface RecipeData {
 
 const RecipePage = () => {
   const [recipeData, setRecipeData] = useState<RecipeData | null>(null);
+  const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
   const { date } = useParams<{ date: string }>();
   const navigate = useNavigate();
   const location = useLocation();
@@ -53,6 +55,33 @@ const RecipePage = () => {
     if (!dateString) return "";
     const date = new Date(dateString);
     return `${date.getFullYear()}年${date.getMonth() + 1}月${date.getDate()}日`;
+  };
+
+  const handleDeleteRecipe = async () => {
+    if (!recipeData?.id || !date) return;
+
+    try {
+      const response = await fetch(`http://localhost:8000/recipe/record/${recipeData.id}/${date}`, {
+        method: 'DELETE',
+      });
+
+      if (response.ok) {
+        setShowDeleteConfirm(false);
+        navigate(`/recipe/${date}`);
+      } else {
+        console.error('削除に失敗しました');
+      }
+    } catch (error) {
+      console.error('削除エラー:', error);
+    }
+  };
+
+  const confirmDelete = () => {
+    setShowDeleteConfirm(true);
+  };
+
+  const cancelDelete = () => {
+    setShowDeleteConfirm(false);
   };
 
   if (!recipeData) {
@@ -114,9 +143,84 @@ const RecipePage = () => {
                 ))}
               </ol>
             </div>
+            
+            {/* 削除ボタン */}
+            {recipeData.id && (
+              <div className="mt-8 pt-6 border-t border-gray-200">
+                <button
+                  onClick={confirmDelete}
+                  className="w-full bg-red-500 hover:bg-red-600 active:scale-95 text-white font-medium py-3 px-6 rounded-lg transition-all duration-150 flex items-center justify-center gap-2 shadow-lg"
+                >
+                  <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    width="18"
+                    height="18"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    strokeWidth="2"
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                  >
+                    <path d="M3 6h18"></path>
+                    <path d="M19 6v14c0 1-1 2-2 2H7c-1 0-2-1-2-2V6"></path>
+                    <path d="M8 6V4c0-1 1-2 2-2h4c1 0 2 1 2 2v2"></path>
+                    <line x1="10" x2="10" y1="11" y2="17"></line>
+                    <line x1="14" x2="14" y1="11" y2="17"></line>
+                  </svg>
+                  このレシピを削除する
+                </button>
+              </div>
+            )}
           </div>
         </div>
       </div>
+      
+      {/* 削除確認モーダル */}
+      {showDeleteConfirm && (
+        <div className="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center z-50 animate-in fade-in duration-200">
+          <div className="bg-white rounded-xl p-6 max-w-sm mx-4 shadow-2xl animate-in zoom-in-95 duration-200">
+            <div className="flex items-center mb-4">
+              <div className="w-10 h-10 bg-red-100 rounded-full flex items-center justify-center mr-3">
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  width="20"
+                  height="20"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  strokeWidth="2"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  className="text-red-600"
+                >
+                  <path d="M3 6h18"></path>
+                  <path d="M19 6v14c0 1-1 2-2 2H7c-1 0-2-1-2-2V6"></path>
+                  <path d="M8 6V4c0-1 1-2 2-2h4c1 0 2 1 2 2v2"></path>
+                  <line x1="10" x2="10" y1="11" y2="17"></line>
+                  <line x1="14" x2="14" y1="11" y2="17"></line>
+                </svg>
+              </div>
+              <h3 className="text-xl font-bold text-gray-900">レシピを削除</h3>
+            </div>
+            <p className="text-gray-600 mb-6 leading-relaxed">「{recipeData.title}」を完全に削除します。この操作は取り消すことができません。</p>
+            <div className="flex gap-3 justify-end">
+              <button
+                onClick={cancelDelete}
+                className="px-5 py-2.5 bg-gray-100 text-gray-700 rounded-lg hover:bg-gray-200 active:scale-95 transition-all duration-150 font-medium"
+              >
+                キャンセル
+              </button>
+              <button
+                onClick={handleDeleteRecipe}
+                className="px-5 py-2.5 bg-red-500 text-white rounded-lg hover:bg-red-600 active:scale-95 transition-all duration-150 font-medium shadow-lg"
+              >
+                削除する
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 };

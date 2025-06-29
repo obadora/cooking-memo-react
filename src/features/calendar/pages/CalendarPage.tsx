@@ -1,7 +1,7 @@
 // CalendarPage.tsx
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import MonthlyCalendar from "../components/ui/MonthlyCalendar";
+import MonthlyCalendar from "../components/MonthlyCalendar";
 
 const CalendarPage = () => {
   const [selectedDate, setSelectedDate] = useState<Date | undefined>(undefined);

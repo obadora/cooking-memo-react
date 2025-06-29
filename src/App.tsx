@@ -2,11 +2,13 @@
 import React from "react";
 import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
 import LandingPage from "./pages/LandingPage";
-import CalendarPage from "./pages/CalendarPage";
-import DailyRecipesPage from "./components/recipe/DailyRecipesPage";
-import DailyRecipeDetailPage from "./components/recipe/DailyRecipeDetailPage";
-import AllRecipesPage from "./pages/AllRecipesPage";
-import RecipeDetailPage from "./components/recipe/RecipeDetailPage";
+import { CalendarPage } from "./features/calendar";
+import {
+  AllRecipesPage,
+  DailyRecipesPage,
+  DailyRecipeDetailPage,
+  RecipeDetailPage,
+} from "./features/recipe";
 
 const App: React.FC = () => {
   return (

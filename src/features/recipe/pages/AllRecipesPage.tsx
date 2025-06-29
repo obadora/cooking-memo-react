@@ -29,7 +29,7 @@ interface RecipeData {
   cooking_date?: string; // TODO: 後で消す
 }
 
-const RecipeListPage = () => {
+const AllRecipesPage = () => {
   const [recipes, setRecipes] = useState<RecipeData[]>([]);
   const [loading, setLoading] = useState(true);
   const [currentPage, setCurrentPage] = useState(1);
@@ -186,4 +186,4 @@ const RecipeListPage = () => {
   );
 };
 
-export default RecipeListPage;
+export default AllRecipesPage;

@@ -1,7 +1,7 @@
 // CalendarPage.tsx
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import Calendar from "./Calendar";
+import MonthlyCalendar from "../components/MonthlyCalendar";
 
 const CalendarPage = () => {
   const [selectedDate, setSelectedDate] = useState<Date | undefined>(undefined);
@@ -26,7 +26,7 @@ const CalendarPage = () => {
           カレンダー
         </h1>
         <div className="flex-1">
-          <Calendar
+          <MonthlyCalendar
             onDateSelect={handleDateSelect}
             selectedDate={selectedDate}
           />

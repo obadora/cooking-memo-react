@@ -1,6 +1,5 @@
 import { useEffect, useState } from "react";
 import { useParams, useNavigate, useLocation } from "react-router-dom";
-// import { Recipe } from "./types/recipe";
 
 interface RecipeIngredient {
   name: string;
@@ -22,8 +21,8 @@ interface RecipeData {
   id?: number;
   title: string;
   description?: string;
-  ingredients: RecipeIngredient[]; // オブジェクトの配列に変更
-  steps: RecipeStep[]; // オブジェクトの配列に変更
+  ingredients: RecipeIngredient[];
+  steps: RecipeStep[];
   cook_time?: number;
   servings?: number;
   source_url?: string;
@@ -31,25 +30,47 @@ interface RecipeData {
   recipe_photos: RecipePhoto[];
 }
 
-const RecipePage = () => {
+interface CookingRecord {
+  cooking_date: string;
+}
+
+const RecipeDetailPage = () => {
   const [recipeData, setRecipeData] = useState<RecipeData | null>(null);
+  const [cookingDates, setCookingDates] = useState<string[]>([]);
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
-  const { date } = useParams<{ date: string }>();
+  const [showDateSelection, setShowDateSelection] = useState(false);
   const navigate = useNavigate();
   const location = useLocation();
 
   useEffect(() => {
     if (location.state?.recipe) {
       setRecipeData(location.state.recipe);
+      fetchCookingDates(location.state.recipe.id);
     }
   }, [location]);
 
-  const handleBackToCalendar = (): void => {
+  const fetchCookingDates = async (recipeId: number) => {
+    try {
+      const response = await fetch(
+        `http://localhost:8000/recipe/${recipeId}/cooking-dates`
+      );
+      if (response.ok) {
+        const data = await response.json();
+        setCookingDates(
+          data.map((record: CookingRecord) => record.cooking_date)
+        );
+      }
+    } catch (error) {
+      console.error("Error fetching cooking dates:", error);
+    }
+  };
+
+  const handleBackToHome = (): void => {
     navigate("/");
   };
 
   const handleBackToRecipeList = (): void => {
-    navigate(`/recipe/${date}`);
+    navigate("/recipes");
   };
 
   const formatDate = (dateString: string | undefined): string => {
@@ -59,11 +80,11 @@ const RecipePage = () => {
   };
 
   const handleDeleteRecipe = async () => {
-    if (!recipeData?.id || !date) return;
+    if (!recipeData?.id) return;
 
     try {
       const response = await fetch(
-        `http://localhost:8000/recipe/record/${recipeData.id}/${date}`,
+        `http://localhost:8000/recipe/${recipeData.id}`,
         {
           method: "DELETE",
         }
@@ -71,13 +92,17 @@ const RecipePage = () => {
 
       if (response.ok) {
         setShowDeleteConfirm(false);
-        navigate(`/recipe/${date}`);
+        setShowDateSelection(true);
       } else {
         console.error("削除に失敗しました");
       }
     } catch (error) {
       console.error("削除エラー:", error);
     }
+  };
+
+  const handleDateSelect = (selectedDate: string) => {
+    navigate(`/recipe/${selectedDate}`);
   };
 
   const confirmDelete = () => {
@@ -100,15 +125,15 @@ const RecipePage = () => {
     <div className="min-h-screen bg-gray-100 p-4 flex flex-col">
       <div className="flex-1 flex flex-col">
         <h1 className="text-3xl font-bold text-center text-gray-700 mb-4 flex-shrink-0">
-          {formatDate(date)}のレシピ詳細
+          レシピ詳細
         </h1>
         <div className="flex-1 max-w-4xl mx-auto w-full">
           <div className="mb-4 flex gap-2">
             <button
-              onClick={handleBackToCalendar}
+              onClick={handleBackToHome}
               className="px-4 py-2 bg-gray-300 text-gray-800 rounded hover:bg-gray-400 transition-colors"
             >
-              ← カレンダーに戻る
+              ← ホームに戻る
             </button>
             <button
               onClick={handleBackToRecipeList}
@@ -118,7 +143,6 @@ const RecipePage = () => {
             </button>
           </div>
           <div className="bg-white rounded-lg shadow-lg p-6">
-            {/* 画像をタイトルの上に表示 */}
             {recipeData?.recipe_photos &&
               recipeData.recipe_photos.length > 0 && (
                 <img
@@ -166,7 +190,6 @@ const RecipePage = () => {
               </ol>
             </div>
 
-            {/* 削除ボタン */}
             {recipeData.id && (
               <div className="mt-8 pt-6 border-t border-gray-200">
                 <button
@@ -190,7 +213,7 @@ const RecipePage = () => {
                     <line x1="10" x2="10" y1="11" y2="17"></line>
                     <line x1="14" x2="14" y1="11" y2="17"></line>
                   </svg>
-                  このレシピを削除する
+                  このレシピを完全に削除する
                 </button>
               </div>
             )}
@@ -198,7 +221,6 @@ const RecipePage = () => {
         </div>
       </div>
 
-      {/* 削除確認モーダル */}
       {showDeleteConfirm && (
         <div className="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center z-50 animate-in fade-in duration-200">
           <div className="bg-white rounded-xl p-6 max-w-sm mx-4 shadow-2xl animate-in zoom-in-95 duration-200">
@@ -226,8 +248,9 @@ const RecipePage = () => {
               <h3 className="text-xl font-bold text-gray-900">レシピを削除</h3>
             </div>
             <p className="text-gray-600 mb-6 leading-relaxed">
-              「{recipeData.title}
-              」を完全に削除します。この操作は取り消すことができません。
+              「{recipeData.title}」を完全に削除します。
+              <br />
+              この操作は取り消すことができません。
             </p>
             <div className="flex gap-3 justify-end">
               <button
@@ -246,8 +269,44 @@ const RecipePage = () => {
           </div>
         </div>
       )}
+
+      {showDateSelection && (
+        <div className="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center z-50 animate-in fade-in duration-200">
+          <div className="bg-white rounded-xl p-6 max-w-md mx-4 shadow-2xl animate-in zoom-in-95 duration-200">
+            <h3 className="text-xl font-bold text-gray-900 mb-4">削除完了</h3>
+            <p className="text-gray-600 mb-6">
+              レシピが削除されました。どの日付に移動しますか？
+            </p>
+            <div className="space-y-2 max-h-60 overflow-y-auto">
+              {cookingDates.length > 0 ? (
+                cookingDates.map((cookingDate, index) => (
+                  <button
+                    key={index}
+                    onClick={() => handleDateSelect(cookingDate)}
+                    className="w-full text-left px-4 py-2 bg-gray-50 hover:bg-gray-100 rounded-lg transition-colors"
+                  >
+                    {formatDate(cookingDate)}
+                  </button>
+                ))
+              ) : (
+                <div className="text-gray-500 text-center py-4">
+                  他に調理記録がありません
+                </div>
+              )}
+            </div>
+            <div className="mt-6 pt-4 border-t border-gray-200">
+              <button
+                onClick={handleBackToHome}
+                className="w-full px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition-colors"
+              >
+                ホームに戻る
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 };
 
-export default RecipePage;
+export default RecipeDetailPage;

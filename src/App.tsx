@@ -6,6 +6,7 @@ import CalendarPage from "./CalendarPage";
 import RecipeList from "./RecipeList";
 import RecipeDetail from "./RecipeDetail";
 import RecipeListPage from "./RecipeListPage";
+import RecipeItemDetail from "./RecipeItemDetail";
 
 const App: React.FC = () => {
   return (
@@ -15,6 +16,7 @@ const App: React.FC = () => {
           <Route path="/" element={<HomePage />} />
           <Route path="/calendar" element={<CalendarPage />} />
           <Route path="/recipes" element={<RecipeListPage />} />
+          <Route path="/recipes/detail" element={<RecipeItemDetail />} />
           <Route path="/recipe/:date" element={<RecipeList />} />
           <Route path="/recipe/:date/detail" element={<RecipeDetail />} />
         </Routes>

@@ -1,16 +1,20 @@
 // App.tsx
 import React from "react";
 import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
+import HomePage from "./HomePage";
 import CalendarPage from "./CalendarPage";
 import RecipeList from "./RecipeList";
 import RecipeDetail from "./RecipeDetail";
+import RecipeListPage from "./RecipeListPage";
 
 const App: React.FC = () => {
   return (
     <Router>
-      <div className="h-screen bg-gray-100">
+      <div className="min-h-screen bg-gray-100">
         <Routes>
-          <Route path="/" element={<CalendarPage />} />
+          <Route path="/" element={<HomePage />} />
+          <Route path="/calendar" element={<CalendarPage />} />
+          <Route path="/recipes" element={<RecipeListPage />} />
           <Route path="/recipe/:date" element={<RecipeList />} />
           <Route path="/recipe/:date/detail" element={<RecipeDetail />} />
         </Routes>

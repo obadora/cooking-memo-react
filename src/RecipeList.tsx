@@ -19,6 +19,7 @@ interface RecipePhoto {
 }
 
 interface RecipeData {
+  id?: number;
   title: string;
   description?: string;
   ingredients: RecipeIngredient[]; // オブジェクトの配列に変更
@@ -46,7 +47,7 @@ const RecipePage = () => {
         body: JSON.stringify({ source_url: inputUrl, cooking_date: date }),
       });
       const data = await response.json();
-      setRecipes(prev => [...prev, data]);
+      setRecipes((prev) => [...prev, data]);
       setInputUrl("");
     } catch (error) {
       console.error("Error fetching data:", error);
@@ -78,7 +79,9 @@ const RecipePage = () => {
   // 日付のレシピを取得する関数
   const fetchRecipesForDate = async (cookingDate: string) => {
     try {
-      const response = await fetch(`http://localhost:8000/recipes/date/${cookingDate}`);
+      const response = await fetch(
+        `http://localhost:8000/recipes/date/${cookingDate}`
+      );
       if (response.ok) {
         const data = await response.json();
         setRecipes(data);
@@ -134,27 +137,32 @@ const RecipePage = () => {
             <div className="grid grid-cols-3 gap-4">
               {recipes.map((recipe, index) => (
                 <div
-                  key={index}
-                  onClick={() => handleRecipeClick(recipe)}
-                  className="bg-white rounded-lg shadow-lg overflow-hidden cursor-pointer hover:shadow-xl transition-shadow aspect-square"
+                  key={recipe.id || index}
+                  className="bg-white rounded-lg shadow-lg overflow-hidden hover:shadow-xl transition-shadow aspect-square relative"
                 >
-                  <div className="h-3/4 overflow-hidden">
-                    {recipe.recipe_photos && recipe.recipe_photos.length > 0 ? (
-                      <img
-                        src={recipe.recipe_photos[0].photo_url}
-                        alt={recipe.title}
-                        className="w-full h-full object-cover"
-                      />
-                    ) : (
-                      <div className="w-full h-full bg-gray-200 flex items-center justify-center">
-                        <span className="text-gray-500">画像なし</span>
-                      </div>
-                    )}
-                  </div>
-                  <div className="h-1/4 p-3 flex items-center">
-                    <h3 className="text-sm font-semibold line-clamp-2 text-gray-800">
-                      {recipe.title}
-                    </h3>
+                  <div
+                    onClick={() => handleRecipeClick(recipe)}
+                    className="cursor-pointer h-full"
+                  >
+                    <div className="h-3/4 overflow-hidden">
+                      {recipe.recipe_photos &&
+                      recipe.recipe_photos.length > 0 ? (
+                        <img
+                          src={recipe.recipe_photos[0].photo_url}
+                          alt={recipe.title}
+                          className="w-full h-full object-cover"
+                        />
+                      ) : (
+                        <div className="w-full h-full bg-gray-200 flex items-center justify-center">
+                          <span className="text-gray-500">画像なし</span>
+                        </div>
+                      )}
+                    </div>
+                    <div className="h-1/4 p-3 flex items-center">
+                      <h3 className="text-sm font-semibold line-clamp-2 text-gray-800">
+                        {recipe.title}
+                      </h3>
+                    </div>
                   </div>
                 </div>
               ))}

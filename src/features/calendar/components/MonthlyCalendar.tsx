@@ -1,13 +1,32 @@
 import React, { useState } from "react";
 import { ChevronLeft, ChevronRight } from "lucide-react";
+
+interface CookingRecordData {
+  id?: number;
+  title: string;
+  description?: string;
+  cook_time?: number;
+  servings?: number;
+  source_url?: string;
+  cooking_records: CookingRecords[];
+}
+
+interface CookingRecords {
+  cooking_date: string;
+}
+
 type CalendarProps = {
   onDateSelect?: (date: Date) => void;
   selectedDate?: Date;
+  getCookingRecordsForDate?: (date: Date) => CookingRecordData[];
+  onMonthChange?: (date: Date) => void;
 };
 
 const MonthlyCalendar: React.FC<CalendarProps> = ({
   onDateSelect,
   selectedDate,
+  getCookingRecordsForDate,
+  onMonthChange,
 }) => {
   const [currentDate, setCurrentDate] = useState<Date>(new Date());
 
@@ -35,16 +54,24 @@ const MonthlyCalendar: React.FC<CalendarProps> = ({
 
   // 前月へ移動
   const goToPreviousMonth = (): void => {
-    setCurrentDate(
-      (prev) => new Date(prev.getFullYear(), prev.getMonth() - 1, 1)
+    const newDate = new Date(
+      currentDate.getFullYear(),
+      currentDate.getMonth() - 1,
+      1
     );
+    setCurrentDate(newDate);
+    onMonthChange?.(newDate);
   };
 
   // 次月へ移動
   const goToNextMonth = (): void => {
-    setCurrentDate(
-      (prev) => new Date(prev.getFullYear(), prev.getMonth() + 1, 1)
+    const newDate = new Date(
+      currentDate.getFullYear(),
+      currentDate.getMonth() + 1,
+      1
     );
+    setCurrentDate(newDate);
+    onMonthChange?.(newDate);
   };
 
   // 日付をクリックした時の処理
@@ -224,7 +251,7 @@ const MonthlyCalendar: React.FC<CalendarProps> = ({
           <div
             key={`${dateInfo.date.getFullYear()}-${dateInfo.date.getMonth()}-${dateInfo.date.getDate()}`}
             className={`
-              h-full min-h-20 border rounded-lg cursor-pointer transition-colors p-2 flex flex-col
+              h-32 border rounded-lg cursor-pointer transition-colors p-2 flex flex-col
               ${
                 dateInfo.isCurrentMonth
                   ? "border-gray-300 bg-white hover:bg-gray-50"
@@ -240,13 +267,31 @@ const MonthlyCalendar: React.FC<CalendarProps> = ({
               </span>
             </div>
 
-            {/* スケジュール表示エリア */}
-            <div className="flex-1 flex flex-col gap-1">
-              {/* サンプルのスケジュール項目（現在月のみ表示） */}
-              {dateInfo.isCurrentMonth && (
+            {/* レシピ表示エリア */}
+            <div className="flex-1 flex flex-col gap-1 overflow-hidden">
+              {/* 現在月のみレシピを表示 */}
+              {dateInfo.isCurrentMonth && getCookingRecordsForDate && (
                 <>
+                  {getCookingRecordsForDate(dateInfo.date)
+                    .slice(0, 2)
+                    .map((record, index) => (
+                      <div
+                        key={`${dateInfo.date.getTime()}-${
+                          record.id || index
+                        }-${record.title}`}
+                        className="text-sm bg-orange-100 text-orange-800 px-2 py-1 rounded truncate"
+                        title={record.title}
+                      >
+                        {record.title}
+                      </div>
+                    ))}
+                  {getCookingRecordsForDate(dateInfo.date).length > 2 && (
+                    <div className="text-sm text-gray-500 px-2 py-1 truncate">
+                      +{getCookingRecordsForDate(dateInfo.date).length - 2}件
+                    </div>
+                  )}
                   {isToday(dateInfo.date) && (
-                    <div className="text-xs bg-green-100 text-green-800 px-1 py-0.5 rounded truncate">
+                    <div className="text-sm bg-green-100 text-green-800 px-2 py-1 rounded truncate">
                       今日
                     </div>
                   )}

@@ -45,7 +45,7 @@ const DailyRecipeDetailPage = () => {
   }, [location]);
 
   const handleBackToCalendar = (): void => {
-    navigate("/");
+    navigate("/calendar");
   };
 
   const handleBackToRecipeList = (): void => {

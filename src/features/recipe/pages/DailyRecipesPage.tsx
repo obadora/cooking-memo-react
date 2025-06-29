@@ -63,7 +63,7 @@ const DailyRecipesPage = () => {
   // }, []);
 
   const handleBackToCalendar = (): void => {
-    navigate("/");
+    navigate("/calendar");
   };
 
   const formatDate = (dateString: string | undefined): string => {

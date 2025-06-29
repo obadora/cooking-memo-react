@@ -39,6 +39,9 @@ const RecipeDetailPage = () => {
   const [cookingDates, setCookingDates] = useState<string[]>([]);
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
   const [showDateSelection, setShowDateSelection] = useState(false);
+  const [showDeleteSuccess, setShowDeleteSuccess] = useState(false);
+  const [showDeleteError, setShowDeleteError] = useState(false);
+  const [deleteErrorMessage, setDeleteErrorMessage] = useState("");
   const navigate = useNavigate();
   const location = useLocation();
 
@@ -92,17 +95,32 @@ const RecipeDetailPage = () => {
 
       if (response.ok) {
         setShowDeleteConfirm(false);
-        setShowDateSelection(true);
+        setShowDeleteSuccess(true);
       } else {
-        console.error("削除に失敗しました");
+        const errorText = await response.text();
+        setShowDeleteConfirm(false);
+        setDeleteErrorMessage(`削除に失敗しました (${response.status}): ${errorText}`);
+        setShowDeleteError(true);
       }
     } catch (error) {
-      console.error("削除エラー:", error);
+      setShowDeleteConfirm(false);
+      setDeleteErrorMessage(`ネットワークエラー: ${error instanceof Error ? error.message : "不明なエラー"}`);
+      setShowDeleteError(true);
     }
   };
 
   const handleDateSelect = (selectedDate: string) => {
     navigate(`/recipe/${selectedDate}`);
+  };
+
+  const handleDeleteSuccessOK = () => {
+    setShowDeleteSuccess(false);
+    navigate('/recipes');
+  };
+
+  const handleDeleteErrorOK = () => {
+    setShowDeleteError(false);
+    setDeleteErrorMessage("");
   };
 
   const confirmDelete = () => {
@@ -264,6 +282,82 @@ const RecipeDetailPage = () => {
                 className="px-5 py-2.5 bg-red-500 text-white rounded-lg hover:bg-red-600 active:scale-95 transition-all duration-150 font-medium shadow-lg"
               >
                 削除する
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {showDeleteSuccess && (
+        <div className="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center z-50 animate-in fade-in duration-200">
+          <div className="bg-white rounded-xl p-6 max-w-sm mx-4 shadow-2xl animate-in zoom-in-95 duration-200">
+            <div className="flex items-center mb-4">
+              <div className="w-10 h-10 bg-green-100 rounded-full flex items-center justify-center mr-3">
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  width="20"
+                  height="20"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  strokeWidth="2"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  className="text-green-600"
+                >
+                  <path d="M20 6L9 17l-5-5"></path>
+                </svg>
+              </div>
+              <h3 className="text-xl font-bold text-gray-900">削除完了</h3>
+            </div>
+            <p className="text-gray-600 mb-6 text-center">
+              削除しました
+            </p>
+            <div className="flex justify-center">
+              <button
+                onClick={handleDeleteSuccessOK}
+                className="px-6 py-2.5 bg-blue-500 text-white rounded-lg hover:bg-blue-600 active:scale-95 transition-all duration-150 font-medium shadow-lg"
+              >
+                OK
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {showDeleteError && (
+        <div className="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center z-50 animate-in fade-in duration-200">
+          <div className="bg-white rounded-xl p-6 max-w-sm mx-4 shadow-2xl animate-in zoom-in-95 duration-200">
+            <div className="flex items-center mb-4">
+              <div className="w-10 h-10 bg-red-100 rounded-full flex items-center justify-center mr-3">
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  width="20"
+                  height="20"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  strokeWidth="2"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  className="text-red-600"
+                >
+                  <circle cx="12" cy="12" r="10"></circle>
+                  <line x1="15" x2="9" y1="9" y2="15"></line>
+                  <line x1="9" x2="15" y1="9" y2="15"></line>
+                </svg>
+              </div>
+              <h3 className="text-xl font-bold text-gray-900">削除エラー</h3>
+            </div>
+            <p className="text-gray-600 mb-6 text-sm leading-relaxed">
+              {deleteErrorMessage}
+            </p>
+            <div className="flex justify-center">
+              <button
+                onClick={handleDeleteErrorOK}
+                className="px-6 py-2.5 bg-gray-500 text-white rounded-lg hover:bg-gray-600 active:scale-95 transition-all duration-150 font-medium shadow-lg"
+              >
+                OK
               </button>
             </div>
           </div>

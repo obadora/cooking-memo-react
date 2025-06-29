@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import { useParams, useNavigate, useLocation } from "react-router-dom";
 // import { Recipe } from "./types/recipe";
 
@@ -61,18 +61,21 @@ const RecipePage = () => {
     if (!recipeData?.id || !date) return;
 
     try {
-      const response = await fetch(`http://localhost:8000/recipe/record/${recipeData.id}/${date}`, {
-        method: 'DELETE',
-      });
+      const response = await fetch(
+        `http://localhost:8000/recipe/record/${recipeData.id}/${date}`,
+        {
+          method: "DELETE",
+        }
+      );
 
       if (response.ok) {
         setShowDeleteConfirm(false);
         navigate(`/recipe/${date}`);
       } else {
-        console.error('削除に失敗しました');
+        console.error("削除に失敗しました");
       }
     } catch (error) {
-      console.error('削除エラー:', error);
+      console.error("削除エラー:", error);
     }
   };
 
@@ -115,13 +118,14 @@ const RecipePage = () => {
           </div>
           <div className="bg-white rounded-lg shadow-lg p-6">
             {/* 画像をタイトルの上に表示 */}
-            {recipeData?.recipe_photos && recipeData.recipe_photos.length > 0 && (
-              <img
-                src={recipeData.recipe_photos[0].photo_url}
-                alt={recipeData.title}
-                className="mx-auto mb-4 rounded shadow max-h-64 object-contain"
-              />
-            )}
+            {recipeData?.recipe_photos &&
+              recipeData.recipe_photos.length > 0 && (
+                <img
+                  src={recipeData.recipe_photos[0].photo_url}
+                  alt={recipeData.title}
+                  className="mx-auto mb-4 rounded shadow max-h-64 object-contain"
+                />
+              )}
             <h2 className="text-2xl font-bold mb-4">{recipeData.title}</h2>
             <div className="mb-6">
               <h3 className="text-xl font-semibold mb-2">材料</h3>
@@ -143,7 +147,7 @@ const RecipePage = () => {
                 ))}
               </ol>
             </div>
-            
+
             {/* 削除ボタン */}
             {recipeData.id && (
               <div className="mt-8 pt-6 border-t border-gray-200">
@@ -175,7 +179,7 @@ const RecipePage = () => {
           </div>
         </div>
       </div>
-      
+
       {/* 削除確認モーダル */}
       {showDeleteConfirm && (
         <div className="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center z-50 animate-in fade-in duration-200">
@@ -203,7 +207,10 @@ const RecipePage = () => {
               </div>
               <h3 className="text-xl font-bold text-gray-900">レシピを削除</h3>
             </div>
-            <p className="text-gray-600 mb-6 leading-relaxed">「{recipeData.title}」を完全に削除します。この操作は取り消すことができません。</p>
+            <p className="text-gray-600 mb-6 leading-relaxed">
+              「{recipeData.title}
+              」を完全に削除します。この操作は取り消すことができません。
+            </p>
             <div className="flex gap-3 justify-end">
               <button
                 onClick={cancelDelete}

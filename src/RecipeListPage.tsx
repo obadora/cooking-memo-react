@@ -59,10 +59,8 @@ const RecipeListPage = () => {
   const totalPages = Math.ceil(recipes.length / recipesPerPage);
 
   const handleRecipeClick = (recipe: RecipeData) => {
-    const dateString = recipe.cooking_date
-      ? new Date(recipe.cooking_date).toISOString().split("T")[0]
-      : new Date().toISOString().split("T")[0];
-    navigate(`/recipe/${dateString}/detail`, { state: { recipe } });
+    // レシピ詳細ページに遷移
+    navigate(`/recipes/detail`, { state: { recipe } });
   };
 
   const handlePageChange = (pageNumber: number) => {

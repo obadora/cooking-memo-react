@@ -5,7 +5,10 @@ type CalendarProps = {
   selectedDate?: Date;
 };
 
-const Calendar: React.FC<CalendarProps> = ({ onDateSelect, selectedDate }) => {
+const MonthlyCalendar: React.FC<CalendarProps> = ({
+  onDateSelect,
+  selectedDate,
+}) => {
   const [currentDate, setCurrentDate] = useState<Date>(new Date());
 
   const today = new Date();
@@ -257,4 +260,4 @@ const Calendar: React.FC<CalendarProps> = ({ onDateSelect, selectedDate }) => {
   );
 };
 
-export default Calendar;
+export default MonthlyCalendar;

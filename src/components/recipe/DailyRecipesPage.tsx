@@ -30,7 +30,7 @@ interface RecipeData {
   recipe_photos: RecipePhoto[];
 }
 
-const RecipePage = () => {
+const DailyRecipesPage = () => {
   const [recipes, setRecipes] = useState<RecipeData[]>([]);
   const [inputUrl, setInputUrl] = useState<string>("");
   const { date } = useParams<{ date: string }>();
@@ -178,4 +178,4 @@ const RecipePage = () => {
   );
 };
 
-export default RecipePage;
+export default DailyRecipesPage;

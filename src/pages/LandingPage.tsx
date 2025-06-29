@@ -1,6 +1,6 @@
 import { useNavigate } from "react-router-dom";
 
-const HomePage = () => {
+const LandingPage = () => {
   const navigate = useNavigate();
 
   return (
@@ -33,4 +33,4 @@ const HomePage = () => {
   );
 };
 
-export default HomePage;
+export default LandingPage;

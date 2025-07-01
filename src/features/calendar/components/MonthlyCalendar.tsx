@@ -162,8 +162,12 @@ const MonthlyCalendar: React.FC<CalendarProps> = ({
       });
     }
 
-    // 次月の日付（5週分まで埋める）
-    const totalCells = 35; // 5週 × 7日
+    // 必要な行数を動的に計算
+    const totalDaysUsed = startDayOfWeek + daysInMonth;
+    const weeksNeeded = Math.ceil(totalDaysUsed / 7);
+    const totalCells = weeksNeeded * 7;
+    
+    // 次月の日付
     const nextMonth = new Date(
       currentDate.getFullYear(),
       currentDate.getMonth() + 1,

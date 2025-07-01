@@ -166,7 +166,7 @@ const MonthlyCalendar: React.FC<CalendarProps> = ({
     const totalDaysUsed = startDayOfWeek + daysInMonth;
     const weeksNeeded = Math.ceil(totalDaysUsed / 7);
     const totalCells = weeksNeeded * 7;
-    
+
     // 次月の日付
     const nextMonth = new Date(
       currentDate.getFullYear(),
@@ -273,8 +273,8 @@ const MonthlyCalendar: React.FC<CalendarProps> = ({
 
             {/* レシピ表示エリア */}
             <div className="flex-1 flex flex-col gap-1 overflow-hidden">
-              {/* 現在月のみレシピを表示 */}
-              {dateInfo.isCurrentMonth && getCookingRecordsForDate && (
+              {/* 全ての日付でレシピを表示 */}
+              {getCookingRecordsForDate && (
                 <>
                   {getCookingRecordsForDate(dateInfo.date)
                     .slice(0, 2)
@@ -283,14 +283,24 @@ const MonthlyCalendar: React.FC<CalendarProps> = ({
                         key={`${dateInfo.date.getTime()}-${
                           record.id || index
                         }-${record.title}`}
-                        className="text-sm bg-orange-100 text-orange-800 px-2 py-1 rounded truncate"
+                        className={`text-sm px-2 py-1 rounded truncate ${
+                          dateInfo.isCurrentMonth
+                            ? "bg-orange-100 text-orange-800"
+                            : "bg-gray-100 text-gray-600"
+                        }`}
                         title={record.title}
                       >
                         {record.title}
                       </div>
                     ))}
                   {getCookingRecordsForDate(dateInfo.date).length > 2 && (
-                    <div className="text-sm text-gray-500 px-2 py-1 truncate">
+                    <div
+                      className={`text-sm px-2 py-1 truncate ${
+                        dateInfo.isCurrentMonth
+                          ? "text-gray-500"
+                          : "text-gray-400"
+                      }`}
+                    >
                       +{getCookingRecordsForDate(dateInfo.date).length - 2}件
                     </div>
                   )}

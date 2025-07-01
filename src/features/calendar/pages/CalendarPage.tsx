@@ -39,12 +39,14 @@ const CalendarPage = () => {
   const fetchCookingRecordsForMonth = async (year: number, month: number) => {
     try {
       console.log(`Fetching cooking records for ${year}-${month}...`);
-      const monthString = `${year}-${String(month).padStart(2, "0")}`;
+      // const monthString = `${year}-${String(month).padStart(2, "0")}`;
 
       // 月ごとのCookingRecordを取得するAPIエンドポイント
-      const response = await fetch(
-        `http://localhost:8000/cooking-records/month/${monthString}`
-      );
+      // const response = await fetch(
+      //   `http://localhost:8000/cooking-records/month/${monthString}`
+      // );
+      // すべてのCookingRecordを取得するAPIエンドポイント
+      const response = await fetch(`http://localhost:8000/recipes`);
 
       if (response.ok) {
         const data = await response.json();
@@ -76,7 +78,10 @@ const CalendarPage = () => {
     console.log("All cooking records:", cookingRecords);
     console.log(
       "Cooking record dates:",
-      cookingRecords.map((r) => r.cooking_records[0].cooking_date)
+      // cookingRecords.map((r) => r.cooking_records[0].cooking_date)
+      cookingRecords.map((record) =>
+        record.cooking_records.map((r) => r.cooking_date)
+      )
     );
 
     const filteredRecords = cookingRecords.filter((record) => {
@@ -84,18 +89,17 @@ const CalendarPage = () => {
       if (!record.cooking_records[0]) {
         return false;
       }
-      const recordDate = record.cooking_records[0].cooking_date;
-
-      // ISO形式の場合（YYYY-MM-DDTHH:mm:ss）
-      if (recordDate.includes("T")) {
-        const isoDatePart = recordDate.split("T")[0];
-        return isoDatePart === dateString;
-      }
-
-      // 通常の形式（YYYY-MM-DD）
-      return recordDate === dateString;
+      // const recordDate = record.cooking_records[0].cooking_date;
+      const dates = record.cooking_records.map((r) => {
+        // ISO形式なら日付部分だけ抽出
+        if (r.cooking_date.includes("T")) {
+          return r.cooking_date.split("T")[0];
+        }
+        return r.cooking_date;
+      });
+      // dateStringと一致する日付があればtrue
+      return dates.includes(dateString);
     });
-
     console.log(
       `Found ${filteredRecords.length} cooking records for ${dateString}:`,
       filteredRecords

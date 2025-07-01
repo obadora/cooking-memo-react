@@ -99,12 +99,18 @@ const RecipeDetailPage = () => {
       } else {
         const errorText = await response.text();
         setShowDeleteConfirm(false);
-        setDeleteErrorMessage(`削除に失敗しました (${response.status}): ${errorText}`);
+        setDeleteErrorMessage(
+          `削除に失敗しました (${response.status}): ${errorText}`
+        );
         setShowDeleteError(true);
       }
     } catch (error) {
       setShowDeleteConfirm(false);
-      setDeleteErrorMessage(`ネットワークエラー: ${error instanceof Error ? error.message : "不明なエラー"}`);
+      setDeleteErrorMessage(
+        `ネットワークエラー: ${
+          error instanceof Error ? error.message : "不明なエラー"
+        }`
+      );
       setShowDeleteError(true);
     }
   };
@@ -115,7 +121,7 @@ const RecipeDetailPage = () => {
 
   const handleDeleteSuccessOK = () => {
     setShowDeleteSuccess(false);
-    navigate('/recipes');
+    navigate("/recipes");
   };
 
   const handleDeleteErrorOK = () => {
@@ -142,9 +148,6 @@ const RecipeDetailPage = () => {
   return (
     <div className="min-h-screen bg-gray-100 p-4 flex flex-col">
       <div className="flex-1 flex flex-col">
-        <h1 className="text-3xl font-bold text-center text-gray-700 mb-4 flex-shrink-0">
-          レシピ詳細
-        </h1>
         <div className="flex-1 max-w-4xl mx-auto w-full">
           <div className="mb-4 flex gap-2">
             <button
@@ -310,9 +313,7 @@ const RecipeDetailPage = () => {
               </div>
               <h3 className="text-xl font-bold text-gray-900">削除完了</h3>
             </div>
-            <p className="text-gray-600 mb-6 text-center">
-              削除しました
-            </p>
+            <p className="text-gray-600 mb-6 text-center">削除しました</p>
             <div className="flex justify-center">
               <button
                 onClick={handleDeleteSuccessOK}

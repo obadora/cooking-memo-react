@@ -105,12 +105,6 @@ const DailyRecipeDetailPage = () => {
         <div className="flex-1 max-w-4xl mx-auto w-full">
           <div className="mb-4 flex gap-2">
             <button
-              onClick={handleBackToCalendar}
-              className="px-4 py-2 bg-gray-300 text-gray-800 rounded hover:bg-gray-400 transition-colors"
-            >
-              ← カレンダーに戻る
-            </button>
-            <button
               onClick={handleBackToRecipeList}
               className="px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600 transition-colors"
             >
@@ -190,7 +184,7 @@ const DailyRecipeDetailPage = () => {
                     <line x1="10" x2="10" y1="11" y2="17"></line>
                     <line x1="14" x2="14" y1="11" y2="17"></line>
                   </svg>
-                  このレシピを削除する
+                  この日のレシピを削除する
                 </button>
               </div>
             )}
@@ -227,7 +221,7 @@ const DailyRecipeDetailPage = () => {
             </div>
             <p className="text-gray-600 mb-6 leading-relaxed">
               「{recipeData.title}
-              」を完全に削除します。この操作は取り消すことができません。
+              」を削除します。他の日付には残ります。
             </p>
             <div className="flex gap-3 justify-end">
               <button

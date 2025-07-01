@@ -290,11 +290,6 @@ const MonthlyCalendar: React.FC<CalendarProps> = ({
                       +{getCookingRecordsForDate(dateInfo.date).length - 2}件
                     </div>
                   )}
-                  {isToday(dateInfo.date) && (
-                    <div className="text-sm bg-green-100 text-green-800 px-2 py-1 rounded truncate">
-                      今日
-                    </div>
-                  )}
                 </>
               )}
             </div>

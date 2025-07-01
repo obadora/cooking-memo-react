@@ -79,14 +79,24 @@ const AllRecipesPage = () => {
   return (
     <div className="min-h-screen bg-gray-100 p-4">
       <div className="max-w-6xl mx-auto">
-        <div className="flex items-center justify-between mb-6">
-          <h1 className="text-3xl font-bold text-gray-700">レシピ一覧</h1>
-          <button
-            onClick={() => navigate("/")}
-            className="bg-gray-500 hover:bg-gray-600 text-white px-4 py-2 rounded-lg transition duration-200"
-          >
-            ホームに戻る
-          </button>
+        <div className="flex justify-center mb-6">
+          <div className="flex gap-4">
+            <button className="bg-green-600 text-white px-4 py-2 rounded-lg cursor-default">
+              レシピ一覧
+            </button>
+            <button
+              onClick={() => navigate("/calendar")}
+              className="bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded-lg transition duration-200"
+            >
+              カレンダー
+            </button>
+            <button
+              onClick={() => console.log("ログイン機能は未実装です")}
+              className="bg-gray-500 hover:bg-gray-600 text-white px-4 py-2 rounded-lg transition duration-200"
+            >
+              ログイン
+            </button>
+          </div>
         </div>
 
         {recipes.length === 0 ? (

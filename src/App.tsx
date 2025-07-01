@@ -1,7 +1,6 @@
 // App.tsx
 import React from "react";
 import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
-import LandingPage from "./pages/LandingPage";
 import { CalendarPage } from "./features/calendar";
 import {
   AllRecipesPage,
@@ -15,7 +14,7 @@ const App: React.FC = () => {
     <Router>
       <div className="min-h-screen bg-gray-100">
         <Routes>
-          <Route path="/" element={<LandingPage />} />
+          <Route path="/" element={<AllRecipesPage />} />
           <Route path="/calendar" element={<CalendarPage />} />
           <Route path="/recipes" element={<AllRecipesPage />} />
           <Route path="/recipes/detail" element={<RecipeDetailPage />} />

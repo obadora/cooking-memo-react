@@ -116,6 +116,27 @@ const CalendarPage = () => {
 
   return (
     <div className="min-h-screen bg-gray-100 p-4 flex flex-col">
+      <div className="max-w-6xl mx-auto w-full">
+        <div className="flex justify-center mb-6">
+          <div className="flex gap-4">
+            <button
+              onClick={() => navigate("/")}
+              className="bg-green-500 hover:bg-green-600 text-white px-4 py-2 rounded-lg transition duration-200"
+            >
+              レシピ一覧
+            </button>
+            <button className="bg-blue-600 text-white px-4 py-2 rounded-lg cursor-default">
+              カレンダー
+            </button>
+            <button
+              onClick={() => console.log("ログイン機能は未実装です")}
+              className="bg-gray-500 hover:bg-gray-600 text-white px-4 py-2 rounded-lg transition duration-200"
+            >
+              ログイン
+            </button>
+          </div>
+        </div>
+      </div>
       <div className="flex-1 flex flex-col">
         <div className="flex-1">
           <MonthlyCalendar

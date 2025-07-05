@@ -91,6 +91,12 @@ const AllRecipesPage = () => {
               カレンダー
             </button>
             <button
+              onClick={() => navigate("/search")}
+              className="bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded-lg transition duration-200"
+            >
+              検索
+            </button>
+            <button
               onClick={() => console.log("ログイン機能は未実装です")}
               className="bg-gray-500 hover:bg-gray-600 text-white px-4 py-2 rounded-lg transition duration-200"
             >

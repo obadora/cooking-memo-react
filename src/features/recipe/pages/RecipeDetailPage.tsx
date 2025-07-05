@@ -151,12 +151,6 @@ const RecipeDetailPage = () => {
         <div className="flex-1 max-w-4xl mx-auto w-full">
           <div className="mb-4 flex gap-2">
             <button
-              onClick={handleBackToHome}
-              className="px-4 py-2 bg-gray-300 text-gray-800 rounded hover:bg-gray-400 transition-colors"
-            >
-              ← ホームに戻る
-            </button>
-            <button
               onClick={handleBackToRecipeList}
               className="px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600 transition-colors"
             >

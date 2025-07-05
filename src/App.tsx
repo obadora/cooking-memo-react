@@ -7,6 +7,7 @@ import {
   DailyRecipesPage,
   DailyRecipeDetailPage,
   RecipeDetailPage,
+  RecipeSearchPage,
 } from "./features/recipe";
 
 const App: React.FC = () => {
@@ -18,6 +19,7 @@ const App: React.FC = () => {
           <Route path="/calendar" element={<CalendarPage />} />
           <Route path="/recipes" element={<AllRecipesPage />} />
           <Route path="/recipes/detail" element={<RecipeDetailPage />} />
+          <Route path="/search" element={<RecipeSearchPage />} />
           <Route path="/recipe/:date" element={<DailyRecipesPage />} />
           <Route
             path="/recipe/:date/detail"

@@ -94,7 +94,7 @@ const RecipeSearchPage = () => {
   };
 
   const handleRecipeClick = (recipe: RecipeData) => {
-    navigate(`/recipes/detail`, { state: { recipe } });
+    navigate(`/recipes/detail`, { state: { recipe, fromSearch: true } });
   };
 
   const handlePageChange = (pageNumber: number) => {

@@ -135,7 +135,11 @@ const RecipeDetailPage = () => {
   };
 
   const handleBackToRecipeList = (): void => {
-    navigate("/recipes");
+    if (location.state?.fromSearch) {
+      navigate("/search");
+    } else {
+      navigate("/recipes");
+    }
   };
 
   const formatDate = (dateString: string | undefined): string => {
@@ -216,7 +220,7 @@ const RecipeDetailPage = () => {
               onClick={handleBackToRecipeList}
               className="px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600 transition-colors"
             >
-              ← レシピ一覧に戻る
+              ← {location.state?.fromSearch ? '検索画面に戻る' : 'レシピ一覧に戻る'}
             </button>
           </div>
           <div className="bg-white rounded-lg shadow-lg p-6">

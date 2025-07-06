@@ -46,6 +46,10 @@ const RecipeDetailPage = () => {
   const [deleteErrorMessage, setDeleteErrorMessage] = useState("");
   const [availableTags, setAvailableTags] = useState<Tag[]>([]);
   const [showTagSelector, setShowTagSelector] = useState(false);
+  const [showTagManager, setShowTagManager] = useState(false);
+  const [tagInputValue, setTagInputValue] = useState("");
+  const [editingTagId, setEditingTagId] = useState<number | null>(null);
+  const [editingTagName, setEditingTagName] = useState("");
   const navigate = useNavigate();
   const location = useLocation();
 
@@ -127,6 +131,72 @@ const RecipeDetailPage = () => {
       }
     } catch (error) {
       console.error("Error removing tag:", error);
+    }
+  };
+
+  const createTag = async () => {
+    if (!tagInputValue.trim()) return;
+    
+    try {
+      const response = await fetch("http://localhost:8000/tag", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ name: tagInputValue.trim() }),
+      });
+      if (response.ok) {
+        const newTag = await response.json();
+        setAvailableTags(prev => [...prev, newTag]);
+        setTagInputValue("");
+      }
+    } catch (error) {
+      console.error("Error creating tag:", error);
+    }
+  };
+
+  const updateTag = async (tagId: number, newName: string) => {
+    if (!newName.trim()) return;
+    
+    try {
+      const response = await fetch(`http://localhost:8000/tag/${tagId}`, {
+        method: "PUT",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ name: newName.trim() }),
+      });
+      if (response.ok) {
+        const updatedTag = await response.json();
+        setAvailableTags(prev => 
+          prev.map(tag => tag.id === tagId ? updatedTag : tag)
+        );
+        setRecipeData(prev => ({
+          ...prev!,
+          tags: prev!.tags?.map(tag => tag.id === tagId ? updatedTag : tag)
+        }));
+        setEditingTagId(null);
+        setEditingTagName("");
+      }
+    } catch (error) {
+      console.error("Error updating tag:", error);
+    }
+  };
+
+  const deleteTag = async (tagId: number) => {
+    try {
+      const response = await fetch(`http://localhost:8000/tag/${tagId}`, {
+        method: "DELETE",
+      });
+      if (response.ok) {
+        setAvailableTags(prev => prev.filter(tag => tag.id !== tagId));
+        setRecipeData(prev => ({
+          ...prev!,
+          tags: prev!.tags?.filter(tag => tag.id !== tagId) || []
+        }));
+      }
+    } catch (error) {
+      console.error("Error deleting tag:", error);
     }
   };
 
@@ -320,6 +390,26 @@ const RecipeDetailPage = () => {
                     <line x1="5" x2="19" y1="12" y2="12"></line>
                   </svg>
                   タグを追加
+                </button>
+                <button
+                  onClick={() => setShowTagManager(true)}
+                  className="inline-flex items-center gap-1 px-3 py-1 bg-purple-100 text-purple-600 rounded-full text-sm hover:bg-purple-200 transition-colors"
+                >
+                  <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    width="14"
+                    height="14"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    strokeWidth="2"
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                  >
+                    <path d="M12.22 2h-.44a2 2 0 0 0-2 2v.18a2 2 0 0 1-1 1.73l-.43.25a2 2 0 0 1-2 0l-.15-.08a2 2 0 0 0-2.73.73l-.22.38a2 2 0 0 0 .73 2.73l.15.1a2 2 0 0 1 1 1.72v.51a2 2 0 0 1-1 1.74l-.15.09a2 2 0 0 0-.73 2.73l.22.38a2 2 0 0 0 2.73.73l.15-.08a2 2 0 0 1 2 0l.43.25a2 2 0 0 1 1 1.73V20a2 2 0 0 0 2 2h.44a2 2 0 0 0 2-2v-.18a2 2 0 0 1 1-1.73l.43-.25a2 2 0 0 1 2 0l.15.08a2 2 0 0 0 2.73-.73l.22-.39a2 2 0 0 0-.73-2.73l-.15-.08a2 2 0 0 1-1-1.74v-.5a2 2 0 0 1 1-1.74l.15-.09a2 2 0 0 0 .73-2.73l-.22-.38a2 2 0 0 0-2.73-.73l-.15.08a2 2 0 0 1-2 0l-.43-.25a2 2 0 0 1-1-1.73V4a2 2 0 0 0-2-2z"></path>
+                    <circle cx="12" cy="12" r="3"></circle>
+                  </svg>
+                  タグ管理
                 </button>
               </div>
             </div>
@@ -545,6 +635,114 @@ const RecipeDetailPage = () => {
                 className="w-full px-4 py-2 bg-gray-100 text-gray-700 rounded-lg hover:bg-gray-200 transition-colors"
               >
                 キャンセル
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {showTagManager && (
+        <div className="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center z-50 animate-in fade-in duration-200">
+          <div className="bg-white rounded-xl p-6 max-w-md mx-4 shadow-2xl animate-in zoom-in-95 duration-200">
+            <h3 className="text-xl font-bold text-gray-900 mb-4">タグ管理</h3>
+            
+            <div className="mb-4">
+              <h4 className="text-sm font-semibold text-gray-700 mb-2">新しいタグを追加</h4>
+              <div className="flex gap-2">
+                <input
+                  type="text"
+                  value={tagInputValue}
+                  onChange={(e) => setTagInputValue(e.target.value)}
+                  placeholder="タグ名を入力"
+                  className="flex-1 px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  onKeyPress={(e) => {
+                    if (e.key === 'Enter') {
+                      createTag();
+                    }
+                  }}
+                />
+                <button
+                  onClick={createTag}
+                  className="px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition-colors"
+                >
+                  追加
+                </button>
+              </div>
+            </div>
+
+            <div className="mb-4">
+              <h4 className="text-sm font-semibold text-gray-700 mb-2">既存のタグ</h4>
+              <div className="max-h-60 overflow-y-auto space-y-2">
+                {availableTags.map((tag) => (
+                  <div
+                    key={tag.id}
+                    className="flex items-center gap-2 p-2 bg-gray-50 rounded-lg"
+                  >
+                    {editingTagId === tag.id ? (
+                      <>
+                        <input
+                          type="text"
+                          value={editingTagName}
+                          onChange={(e) => setEditingTagName(e.target.value)}
+                          className="flex-1 px-2 py-1 border border-gray-300 rounded text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+                          onKeyPress={(e) => {
+                            if (e.key === 'Enter') {
+                              updateTag(tag.id, editingTagName);
+                            }
+                          }}
+                        />
+                        <button
+                          onClick={() => updateTag(tag.id, editingTagName)}
+                          className="px-2 py-1 bg-green-500 text-white rounded text-sm hover:bg-green-600 transition-colors"
+                        >
+                          保存
+                        </button>
+                        <button
+                          onClick={() => {
+                            setEditingTagId(null);
+                            setEditingTagName("");
+                          }}
+                          className="px-2 py-1 bg-gray-500 text-white rounded text-sm hover:bg-gray-600 transition-colors"
+                        >
+                          キャンセル
+                        </button>
+                      </>
+                    ) : (
+                      <>
+                        <span className="flex-1 text-sm">{tag.name}</span>
+                        <button
+                          onClick={() => {
+                            setEditingTagId(tag.id);
+                            setEditingTagName(tag.name);
+                          }}
+                          className="px-2 py-1 bg-blue-500 text-white rounded text-sm hover:bg-blue-600 transition-colors"
+                        >
+                          編集
+                        </button>
+                        <button
+                          onClick={() => deleteTag(tag.id)}
+                          className="px-2 py-1 bg-red-500 text-white rounded text-sm hover:bg-red-600 transition-colors"
+                        >
+                          削除
+                        </button>
+                      </>
+                    )}
+                  </div>
+                ))}
+                {availableTags.length === 0 && (
+                  <div className="text-gray-500 text-center py-4 text-sm">
+                    タグがありません
+                  </div>
+                )}
+              </div>
+            </div>
+
+            <div className="pt-4 border-t border-gray-200">
+              <button
+                onClick={() => setShowTagManager(false)}
+                className="w-full px-4 py-2 bg-gray-100 text-gray-700 rounded-lg hover:bg-gray-200 transition-colors"
+              >
+                閉じる
               </button>
             </div>
           </div>

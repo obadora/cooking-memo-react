@@ -6,9 +6,16 @@ interface PhotoGalleryProps {
   onPhotoDelete: (photoId: number) => void;
 }
 
-const PhotoGallery: React.FC<PhotoGalleryProps> = ({ photos, onPhotoDelete }) => {
-  const [selectedPhotoIndex, setSelectedPhotoIndex] = useState<number | null>(null);
-  const [showDeleteConfirm, setShowDeleteConfirm] = useState<number | null>(null);
+const PhotoGallery: React.FC<PhotoGalleryProps> = ({
+  photos,
+  onPhotoDelete,
+}) => {
+  const [selectedPhotoIndex, setSelectedPhotoIndex] = useState<number | null>(
+    null
+  );
+  const [showDeleteConfirm, setShowDeleteConfirm] = useState<number | null>(
+    null
+  );
 
   const handlePhotoClick = (index: number) => {
     setSelectedPhotoIndex(index);
@@ -16,6 +23,14 @@ const PhotoGallery: React.FC<PhotoGalleryProps> = ({ photos, onPhotoDelete }) =>
 
   const handleCloseModal = () => {
     setSelectedPhotoIndex(null);
+  };
+
+  const handleDeletePhoto = (photoId: number) => {
+    onPhotoDelete(photoId);
+    setShowDeleteConfirm(null);
+    if (selectedPhotoIndex !== null) {
+      setSelectedPhotoIndex(null);
+    }
   };
 
   const handlePrevPhoto = () => {
@@ -27,14 +42,6 @@ const PhotoGallery: React.FC<PhotoGalleryProps> = ({ photos, onPhotoDelete }) =>
   const handleNextPhoto = () => {
     if (selectedPhotoIndex !== null && selectedPhotoIndex < photos.length - 1) {
       setSelectedPhotoIndex(selectedPhotoIndex + 1);
-    }
-  };
-
-  const handleDeletePhoto = (photoId: number) => {
-    onPhotoDelete(photoId);
-    setShowDeleteConfirm(null);
-    if (selectedPhotoIndex !== null) {
-      setSelectedPhotoIndex(null);
     }
   };
 
@@ -60,25 +67,7 @@ const PhotoGallery: React.FC<PhotoGalleryProps> = ({ photos, onPhotoDelete }) =>
               alt={photo.alt_text || `レシピ写真 ${index + 1}`}
               className="w-full h-24 object-cover rounded-lg shadow hover:shadow-md transition-shadow"
             />
-            <div className="absolute inset-0 bg-black bg-opacity-0 group-hover:bg-opacity-20 rounded-lg transition-all duration-200 flex items-center justify-center">
-              <div className="opacity-0 group-hover:opacity-100 transition-opacity">
-                <svg
-                  xmlns="http://www.w3.org/2000/svg"
-                  width="24"
-                  height="24"
-                  viewBox="0 0 24 24"
-                  fill="none"
-                  stroke="white"
-                  strokeWidth="2"
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                >
-                  <path d="M9 18V5l12-2v13"></path>
-                  <circle cx="6" cy="14" r="3"></circle>
-                  <circle cx="18" cy="11" r="3"></circle>
-                </svg>
-              </div>
-            </div>
+            <div className="absolute inset-0 bg-black bg-opacity-0 group-hover:bg-opacity-20 rounded-lg transition-all duration-200"></div>
           </div>
         ))}
       </div>
@@ -89,10 +78,13 @@ const PhotoGallery: React.FC<PhotoGalleryProps> = ({ photos, onPhotoDelete }) =>
           <div className="relative max-w-4xl max-h-[90vh] mx-4">
             <img
               src={`http://localhost:8000${photos[selectedPhotoIndex].photo_url}`}
-              alt={photos[selectedPhotoIndex].alt_text || `レシピ写真 ${selectedPhotoIndex + 1}`}
+              alt={
+                photos[selectedPhotoIndex].alt_text ||
+                `レシピ写真 ${selectedPhotoIndex + 1}`
+              }
               className="max-w-full max-h-full object-contain rounded-lg"
             />
-            
+
             {/* 閉じるボタン */}
             <button
               onClick={handleCloseModal}
@@ -116,7 +108,9 @@ const PhotoGallery: React.FC<PhotoGalleryProps> = ({ photos, onPhotoDelete }) =>
 
             {/* 削除ボタン */}
             <button
-              onClick={() => setShowDeleteConfirm(photos[selectedPhotoIndex].id)}
+              onClick={() =>
+                setShowDeleteConfirm(photos[selectedPhotoIndex].id)
+              }
               className="absolute top-4 left-4 bg-red-500 bg-opacity-80 text-white rounded-full p-2 hover:bg-opacity-100 transition-all"
             >
               <svg
@@ -192,7 +186,7 @@ const PhotoGallery: React.FC<PhotoGalleryProps> = ({ photos, onPhotoDelete }) =>
 
       {/* 削除確認モーダル */}
       {showDeleteConfirm && (
-        <div className="fixed inset-0 bg-black bg-opacity-60 z-60 flex items-center justify-center">
+        <div className="fixed inset-0 bg-black bg-opacity-60 z-[70] flex items-center justify-center">
           <div className="bg-white rounded-xl p-6 max-w-sm mx-4 shadow-2xl">
             <div className="flex items-center mb-4">
               <div className="w-10 h-10 bg-red-100 rounded-full flex items-center justify-center mr-3">

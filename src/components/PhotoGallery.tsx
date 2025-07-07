@@ -67,25 +67,7 @@ const PhotoGallery: React.FC<PhotoGalleryProps> = ({
               alt={photo.alt_text || `レシピ写真 ${index + 1}`}
               className="w-full h-24 object-cover rounded-lg shadow hover:shadow-md transition-shadow"
             />
-            <div className="absolute inset-0 bg-black bg-opacity-0 group-hover:bg-opacity-20 rounded-lg transition-all duration-200 flex items-center justify-center">
-              <div className="opacity-0 group-hover:opacity-100 transition-opacity">
-                <svg
-                  xmlns="http://www.w3.org/2000/svg"
-                  width="24"
-                  height="24"
-                  viewBox="0 0 24 24"
-                  fill="none"
-                  stroke="white"
-                  strokeWidth="2"
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                >
-                  <path d="M9 18V5l12-2v13"></path>
-                  <circle cx="6" cy="14" r="3"></circle>
-                  <circle cx="18" cy="11" r="3"></circle>
-                </svg>
-              </div>
-            </div>
+            <div className="absolute inset-0 bg-black bg-opacity-0 group-hover:bg-opacity-20 rounded-lg transition-all duration-200"></div>
           </div>
         ))}
       </div>

@@ -84,6 +84,7 @@ const DailyRecipesPage = () => {
       );
       if (response.ok) {
         const data = await response.json();
+        console.log("Selected date:", data);
         setRecipes(data);
       } else {
         console.error("Failed to fetch recipes for date:", cookingDate);

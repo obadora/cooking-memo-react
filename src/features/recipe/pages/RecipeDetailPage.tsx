@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { useParams, useNavigate, useLocation } from "react-router-dom";
+import { useNavigate, useLocation } from "react-router-dom";
 import type { Tag } from "../../../types/tag";
 
 interface RecipeIngredient {
@@ -40,7 +40,6 @@ const RecipeDetailPage = () => {
   const [recipeData, setRecipeData] = useState<RecipeData | null>(null);
   const [cookingDates, setCookingDates] = useState<string[]>([]);
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
-  const [showDateSelection, setShowDateSelection] = useState(false);
   const [showDeleteSuccess, setShowDeleteSuccess] = useState(false);
   const [showDeleteError, setShowDeleteError] = useState(false);
   const [deleteErrorMessage, setDeleteErrorMessage] = useState("");

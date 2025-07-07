@@ -119,7 +119,7 @@ const DailyRecipeDetailPage = () => {
 
   const handlePhotoDelete = async (photoId: number) => {
     try {
-      const response = await fetch(`http://localhost:8000/photos/${photoId}`, {
+      const response = await fetch(`http://localhost:8000/photo/${photoId}`, {
         method: "DELETE",
       });
 

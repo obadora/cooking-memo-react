@@ -1,6 +1,9 @@
 import { useEffect, useState } from "react";
 import { useParams, useNavigate, useLocation } from "react-router-dom";
 import type { Tag } from "../../../types/tag";
+import type { RecipePhotoResponse } from "../../../types/api";
+import PhotoUpload from "../../../components/PhotoUpload";
+import PhotoGallery from "../../../components/PhotoGallery";
 // import { Recipe } from "./types/recipe";
 
 interface RecipeIngredient {
@@ -31,8 +34,13 @@ interface RecipeData {
   source_type_id: number;
   recipe_photos: RecipePhoto[];
   tags?: Tag[];
+  cooking_records: CookingRecords[];
 }
 
+interface CookingRecords {
+  id?: number;
+  cooking_date: string;
+}
 const DailyRecipeDetailPage = () => {
   const [recipeData, setRecipeData] = useState<RecipeData | null>(null);
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
@@ -42,6 +50,10 @@ const DailyRecipeDetailPage = () => {
   const [tagInputValue, setTagInputValue] = useState("");
   const [editingTagId, setEditingTagId] = useState<number | null>(null);
   const [editingTagName, setEditingTagName] = useState("");
+  const [nonPrimaryPhotos, setNonPrimaryPhotos] = useState<
+    RecipePhotoResponse[]
+  >([]);
+  const [photoError, setPhotoError] = useState<string>("");
   const { date } = useParams<{ date: string }>();
   const navigate = useNavigate();
   const location = useLocation();
@@ -52,6 +64,36 @@ const DailyRecipeDetailPage = () => {
       fetchAvailableTags();
     }
   }, [location]);
+
+  useEffect(() => {
+    const fetchNonPrimaryPhotos = async () => {
+      if (!recipeData?.id || !date) return;
+
+      // 該当するcooking_recordを探す
+      const matchingRecord = recipeData.cooking_records.find(
+        (record) => record.cooking_date === date
+      );
+
+      if (!matchingRecord?.id) return;
+
+      try {
+        const response = await fetch(
+          `http://localhost:8000/recipe/${recipeData.id}/cooking-record/${matchingRecord.id}/photos`
+        );
+        if (response.ok) {
+          const data = await response.json();
+          console.log("Fetched non-primary photos:", data);
+          setNonPrimaryPhotos(data);
+        }
+      } catch (error) {
+        console.error("Error fetching cooking record photos:", error);
+      }
+    };
+
+    if (recipeData?.id && date) {
+      fetchNonPrimaryPhotos();
+    }
+  }, [recipeData?.id, date]);
 
   const fetchAvailableTags = async () => {
     try {
@@ -65,9 +107,40 @@ const DailyRecipeDetailPage = () => {
     }
   };
 
+  const handlePhotoUploaded = (photo: RecipePhotoResponse) => {
+    setNonPrimaryPhotos((prev) => [...prev, photo]);
+    setPhotoError("");
+  };
+
+  const handlePhotoError = (error: string) => {
+    setPhotoError(error);
+    setTimeout(() => setPhotoError(""), 5000);
+  };
+
+  const handlePhotoDelete = async (photoId: number) => {
+    try {
+      const response = await fetch(`http://localhost:8000/photos/${photoId}`, {
+        method: "DELETE",
+      });
+
+      if (response.ok) {
+        setNonPrimaryPhotos((prev) =>
+          prev.filter((photo) => photo.id !== photoId)
+        );
+      } else {
+        setPhotoError("写真の削除に失敗しました");
+        setTimeout(() => setPhotoError(""), 5000);
+      }
+    } catch (error) {
+      console.error("Error deleting photo:", error);
+      setPhotoError("写真の削除に失敗しました");
+      setTimeout(() => setPhotoError(""), 5000);
+    }
+  };
+
   const addTagToRecipe = async (tagId: number) => {
     if (!recipeData?.id) return;
-    
+
     try {
       const response = await fetch(
         `http://localhost:8000/recipe/${recipeData.id}/tag/${tagId}`,
@@ -76,11 +149,11 @@ const DailyRecipeDetailPage = () => {
         }
       );
       if (response.ok) {
-        const addedTag = availableTags.find(tag => tag.id === tagId);
+        const addedTag = availableTags.find((tag) => tag.id === tagId);
         if (addedTag) {
-          setRecipeData(prev => ({
+          setRecipeData((prev) => ({
             ...prev!,
-            tags: [...(prev!.tags || []), addedTag]
+            tags: [...(prev!.tags || []), addedTag],
           }));
         }
       }
@@ -91,7 +164,7 @@ const DailyRecipeDetailPage = () => {
 
   const removeTagFromRecipe = async (tagId: number) => {
     if (!recipeData?.id) return;
-    
+
     try {
       const response = await fetch(
         `http://localhost:8000/recipe/${recipeData.id}/tag/${tagId}`,
@@ -100,9 +173,9 @@ const DailyRecipeDetailPage = () => {
         }
       );
       if (response.ok) {
-        setRecipeData(prev => ({
+        setRecipeData((prev) => ({
           ...prev!,
-          tags: prev!.tags?.filter(tag => tag.id !== tagId) || []
+          tags: prev!.tags?.filter((tag) => tag.id !== tagId) || [],
         }));
       }
     } catch (error) {
@@ -112,7 +185,7 @@ const DailyRecipeDetailPage = () => {
 
   const createTag = async () => {
     if (!tagInputValue.trim()) return;
-    
+
     try {
       const response = await fetch("http://localhost:8000/tag", {
         method: "POST",
@@ -123,7 +196,7 @@ const DailyRecipeDetailPage = () => {
       });
       if (response.ok) {
         const newTag = await response.json();
-        setAvailableTags(prev => [...prev, newTag]);
+        setAvailableTags((prev) => [...prev, newTag]);
         setTagInputValue("");
       }
     } catch (error) {
@@ -133,7 +206,7 @@ const DailyRecipeDetailPage = () => {
 
   const updateTag = async (tagId: number, newName: string) => {
     if (!newName.trim()) return;
-    
+
     try {
       const response = await fetch(`http://localhost:8000/tag/${tagId}`, {
         method: "PUT",
@@ -144,12 +217,12 @@ const DailyRecipeDetailPage = () => {
       });
       if (response.ok) {
         const updatedTag = await response.json();
-        setAvailableTags(prev => 
-          prev.map(tag => tag.id === tagId ? updatedTag : tag)
+        setAvailableTags((prev) =>
+          prev.map((tag) => (tag.id === tagId ? updatedTag : tag))
         );
-        setRecipeData(prev => ({
+        setRecipeData((prev) => ({
           ...prev!,
-          tags: prev!.tags?.map(tag => tag.id === tagId ? updatedTag : tag)
+          tags: prev!.tags?.map((tag) => (tag.id === tagId ? updatedTag : tag)),
         }));
         setEditingTagId(null);
         setEditingTagName("");
@@ -165,19 +238,15 @@ const DailyRecipeDetailPage = () => {
         method: "DELETE",
       });
       if (response.ok) {
-        setAvailableTags(prev => prev.filter(tag => tag.id !== tagId));
-        setRecipeData(prev => ({
+        setAvailableTags((prev) => prev.filter((tag) => tag.id !== tagId));
+        setRecipeData((prev) => ({
           ...prev!,
-          tags: prev!.tags?.filter(tag => tag.id !== tagId) || []
+          tags: prev!.tags?.filter((tag) => tag.id !== tagId) || [],
         }));
       }
     } catch (error) {
       console.error("Error deleting tag:", error);
     }
-  };
-
-  const handleBackToCalendar = (): void => {
-    navigate("/calendar");
   };
 
   const handleBackToRecipeList = (): void => {
@@ -365,6 +434,45 @@ const DailyRecipeDetailPage = () => {
               </div>
             </div>
 
+            {/* 写真セクション */}
+            <div className="mt-8 pt-6 border-t border-gray-200">
+              <h3 className="text-xl font-semibold mb-4">写真</h3>
+
+              {/* エラーメッセージ */}
+              {photoError && (
+                <div className="mb-4 p-3 bg-red-50 border border-red-200 rounded-lg">
+                  <p className="text-red-600 text-sm">{photoError}</p>
+                </div>
+              )}
+
+              {/* 写真アップロード */}
+              {recipeData.id &&
+                recipeData.cooking_records.length > 0 &&
+                (() => {
+                  const matchingRecord = recipeData.cooking_records.find(
+                    (record) => record.cooking_date === date
+                  );
+                  return (
+                    matchingRecord && (
+                      <div className="mb-4">
+                        <PhotoUpload
+                          recipeId={recipeData.id}
+                          cookingRecordId={matchingRecord.id!}
+                          onPhotoUploaded={handlePhotoUploaded}
+                          onError={handlePhotoError}
+                        />
+                      </div>
+                    )
+                  );
+                })()}
+
+              {/* 写真ギャラリー */}
+              <PhotoGallery
+                photos={nonPrimaryPhotos}
+                onPhotoDelete={handlePhotoDelete}
+              />
+            </div>
+
             {/* 削除ボタン */}
             {recipeData.id && (
               <div className="mt-8 pt-6 border-t border-gray-200">
@@ -452,7 +560,12 @@ const DailyRecipeDetailPage = () => {
             <h3 className="text-xl font-bold text-gray-900 mb-4">タグを追加</h3>
             <div className="max-h-60 overflow-y-auto space-y-2">
               {availableTags
-                .filter(tag => !recipeData?.tags?.some(recipeTag => recipeTag.id === tag.id))
+                .filter(
+                  (tag) =>
+                    !recipeData?.tags?.some(
+                      (recipeTag) => recipeTag.id === tag.id
+                    )
+                )
                 .map((tag) => (
                   <button
                     key={tag.id}
@@ -465,7 +578,12 @@ const DailyRecipeDetailPage = () => {
                     {tag.name}
                   </button>
                 ))}
-              {availableTags.filter(tag => !recipeData?.tags?.some(recipeTag => recipeTag.id === tag.id)).length === 0 && (
+              {availableTags.filter(
+                (tag) =>
+                  !recipeData?.tags?.some(
+                    (recipeTag) => recipeTag.id === tag.id
+                  )
+              ).length === 0 && (
                 <div className="text-gray-500 text-center py-4">
                   追加できるタグがありません
                 </div>
@@ -487,9 +605,11 @@ const DailyRecipeDetailPage = () => {
         <div className="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center z-50 animate-in fade-in duration-200">
           <div className="bg-white rounded-xl p-6 max-w-md mx-4 shadow-2xl animate-in zoom-in-95 duration-200">
             <h3 className="text-xl font-bold text-gray-900 mb-4">タグ管理</h3>
-            
+
             <div className="mb-4">
-              <h4 className="text-sm font-semibold text-gray-700 mb-2">新しいタグを追加</h4>
+              <h4 className="text-sm font-semibold text-gray-700 mb-2">
+                新しいタグを追加
+              </h4>
               <div className="flex gap-2">
                 <input
                   type="text"
@@ -498,7 +618,7 @@ const DailyRecipeDetailPage = () => {
                   placeholder="タグ名を入力"
                   className="flex-1 px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
                   onKeyPress={(e) => {
-                    if (e.key === 'Enter') {
+                    if (e.key === "Enter") {
                       createTag();
                     }
                   }}
@@ -513,7 +633,9 @@ const DailyRecipeDetailPage = () => {
             </div>
 
             <div className="mb-4">
-              <h4 className="text-sm font-semibold text-gray-700 mb-2">既存のタグ</h4>
+              <h4 className="text-sm font-semibold text-gray-700 mb-2">
+                既存のタグ
+              </h4>
               <div className="max-h-60 overflow-y-auto space-y-2">
                 {availableTags.map((tag) => (
                   <div
@@ -528,7 +650,7 @@ const DailyRecipeDetailPage = () => {
                           onChange={(e) => setEditingTagName(e.target.value)}
                           className="flex-1 px-2 py-1 border border-gray-300 rounded text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
                           onKeyPress={(e) => {
-                            if (e.key === 'Enter') {
+                            if (e.key === "Enter") {
                               updateTag(tag.id, editingTagName);
                             }
                           }}

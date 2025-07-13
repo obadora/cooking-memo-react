@@ -48,6 +48,7 @@ const RecipeDetailPage = () => {
   const [showTagManager, setShowTagManager] = useState(false);
   const [tagInputValue, setTagInputValue] = useState("");
   const [editingTagId, setEditingTagId] = useState<number | null>(null);
+  const [showDateSelection, setShowDateSelection] = useState(false);
   const [editingTagName, setEditingTagName] = useState("");
   const navigate = useNavigate();
   const location = useLocation();
@@ -90,7 +91,7 @@ const RecipeDetailPage = () => {
 
   const addTagToRecipe = async (tagId: number) => {
     if (!recipeData?.id) return;
-    
+
     try {
       const response = await fetch(
         `http://localhost:8000/recipe/${recipeData.id}/tag/${tagId}`,
@@ -99,11 +100,11 @@ const RecipeDetailPage = () => {
         }
       );
       if (response.ok) {
-        const addedTag = availableTags.find(tag => tag.id === tagId);
+        const addedTag = availableTags.find((tag) => tag.id === tagId);
         if (addedTag) {
-          setRecipeData(prev => ({
+          setRecipeData((prev) => ({
             ...prev!,
-            tags: [...(prev!.tags || []), addedTag]
+            tags: [...(prev!.tags || []), addedTag],
           }));
         }
       }
@@ -114,7 +115,7 @@ const RecipeDetailPage = () => {
 
   const removeTagFromRecipe = async (tagId: number) => {
     if (!recipeData?.id) return;
-    
+
     try {
       const response = await fetch(
         `http://localhost:8000/recipe/${recipeData.id}/tag/${tagId}`,
@@ -123,9 +124,9 @@ const RecipeDetailPage = () => {
         }
       );
       if (response.ok) {
-        setRecipeData(prev => ({
+        setRecipeData((prev) => ({
           ...prev!,
-          tags: prev!.tags?.filter(tag => tag.id !== tagId) || []
+          tags: prev!.tags?.filter((tag) => tag.id !== tagId) || [],
         }));
       }
     } catch (error) {
@@ -135,7 +136,7 @@ const RecipeDetailPage = () => {
 
   const createTag = async () => {
     if (!tagInputValue.trim()) return;
-    
+
     try {
       const response = await fetch("http://localhost:8000/tag", {
         method: "POST",
@@ -146,7 +147,7 @@ const RecipeDetailPage = () => {
       });
       if (response.ok) {
         const newTag = await response.json();
-        setAvailableTags(prev => [...prev, newTag]);
+        setAvailableTags((prev) => [...prev, newTag]);
         setTagInputValue("");
       }
     } catch (error) {
@@ -156,7 +157,7 @@ const RecipeDetailPage = () => {
 
   const updateTag = async (tagId: number, newName: string) => {
     if (!newName.trim()) return;
-    
+
     try {
       const response = await fetch(`http://localhost:8000/tag/${tagId}`, {
         method: "PUT",
@@ -167,12 +168,12 @@ const RecipeDetailPage = () => {
       });
       if (response.ok) {
         const updatedTag = await response.json();
-        setAvailableTags(prev => 
-          prev.map(tag => tag.id === tagId ? updatedTag : tag)
+        setAvailableTags((prev) =>
+          prev.map((tag) => (tag.id === tagId ? updatedTag : tag))
         );
-        setRecipeData(prev => ({
+        setRecipeData((prev) => ({
           ...prev!,
-          tags: prev!.tags?.map(tag => tag.id === tagId ? updatedTag : tag)
+          tags: prev!.tags?.map((tag) => (tag.id === tagId ? updatedTag : tag)),
         }));
         setEditingTagId(null);
         setEditingTagName("");
@@ -188,10 +189,10 @@ const RecipeDetailPage = () => {
         method: "DELETE",
       });
       if (response.ok) {
-        setAvailableTags(prev => prev.filter(tag => tag.id !== tagId));
-        setRecipeData(prev => ({
+        setAvailableTags((prev) => prev.filter((tag) => tag.id !== tagId));
+        setRecipeData((prev) => ({
           ...prev!,
-          tags: prev!.tags?.filter(tag => tag.id !== tagId) || []
+          tags: prev!.tags?.filter((tag) => tag.id !== tagId) || [],
         }));
       }
     } catch (error) {
@@ -289,7 +290,10 @@ const RecipeDetailPage = () => {
               onClick={handleBackToRecipeList}
               className="px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600 transition-colors"
             >
-              ← {location.state?.fromSearch ? '検索画面に戻る' : 'レシピ一覧に戻る'}
+              ←{" "}
+              {location.state?.fromSearch
+                ? "検索画面に戻る"
+                : "レシピ一覧に戻る"}
             </button>
           </div>
           <div className="bg-white rounded-lg shadow-lg p-6">
@@ -609,7 +613,12 @@ const RecipeDetailPage = () => {
             <h3 className="text-xl font-bold text-gray-900 mb-4">タグを追加</h3>
             <div className="max-h-60 overflow-y-auto space-y-2">
               {availableTags
-                .filter(tag => !recipeData?.tags?.some(recipeTag => recipeTag.id === tag.id))
+                .filter(
+                  (tag) =>
+                    !recipeData?.tags?.some(
+                      (recipeTag) => recipeTag.id === tag.id
+                    )
+                )
                 .map((tag) => (
                   <button
                     key={tag.id}
@@ -622,7 +631,12 @@ const RecipeDetailPage = () => {
                     {tag.name}
                   </button>
                 ))}
-              {availableTags.filter(tag => !recipeData?.tags?.some(recipeTag => recipeTag.id === tag.id)).length === 0 && (
+              {availableTags.filter(
+                (tag) =>
+                  !recipeData?.tags?.some(
+                    (recipeTag) => recipeTag.id === tag.id
+                  )
+              ).length === 0 && (
                 <div className="text-gray-500 text-center py-4">
                   追加できるタグがありません
                 </div>
@@ -644,9 +658,11 @@ const RecipeDetailPage = () => {
         <div className="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center z-50 animate-in fade-in duration-200">
           <div className="bg-white rounded-xl p-6 max-w-md mx-4 shadow-2xl animate-in zoom-in-95 duration-200">
             <h3 className="text-xl font-bold text-gray-900 mb-4">タグ管理</h3>
-            
+
             <div className="mb-4">
-              <h4 className="text-sm font-semibold text-gray-700 mb-2">新しいタグを追加</h4>
+              <h4 className="text-sm font-semibold text-gray-700 mb-2">
+                新しいタグを追加
+              </h4>
               <div className="flex gap-2">
                 <input
                   type="text"
@@ -655,7 +671,7 @@ const RecipeDetailPage = () => {
                   placeholder="タグ名を入力"
                   className="flex-1 px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
                   onKeyPress={(e) => {
-                    if (e.key === 'Enter') {
+                    if (e.key === "Enter") {
                       createTag();
                     }
                   }}
@@ -670,7 +686,9 @@ const RecipeDetailPage = () => {
             </div>
 
             <div className="mb-4">
-              <h4 className="text-sm font-semibold text-gray-700 mb-2">既存のタグ</h4>
+              <h4 className="text-sm font-semibold text-gray-700 mb-2">
+                既存のタグ
+              </h4>
               <div className="max-h-60 overflow-y-auto space-y-2">
                 {availableTags.map((tag) => (
                   <div
@@ -685,7 +703,7 @@ const RecipeDetailPage = () => {
                           onChange={(e) => setEditingTagName(e.target.value)}
                           className="flex-1 px-2 py-1 border border-gray-300 rounded text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
                           onKeyPress={(e) => {
-                            if (e.key === 'Enter') {
+                            if (e.key === "Enter") {
                               updateTag(tag.id, editingTagName);
                             }
                           }}

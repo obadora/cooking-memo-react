@@ -1,0 +1,40 @@
+{
+    "CallerReference": "cooking-memo-1752393127",
+    "Comment": "Cooking Memo React App",
+    "DefaultRootObject": "index.html",
+    "Origins": {
+      "Quantity": 1,
+      "Items": [{
+        "Id": "S3-origin",
+        "DomainName": "cooking-memo-frontend-20250713-cloudshell-user.s3-website-ap-northeast-1.amazonaws.com",
+        "CustomOriginConfig": {
+          "HTTPPort": 80,
+          "HTTPSPort": 443,
+          "OriginProtocolPolicy": "http-only"
+        }
+      }]
+    },
+    "DefaultCacheBehavior": {
+      "TargetOriginId": "S3-origin",
+      "ViewerProtocolPolicy": "redirect-to-https",
+      "ForwardedValues": {
+        "QueryString": false,
+        "Cookies": {"Forward": "none"}
+      },
+      "TrustedSigners": {
+        "Enabled": false,
+        "Quantity": 0
+      },
+      "MinTTL": 0
+    },
+    "CustomErrorResponses": {
+      "Quantity": 1,
+      "Items": [{
+        "ErrorCode": 404,
+        "ResponsePagePath": "/index.html",
+        "ResponseCode": "200"
+      }]
+    },
+    "Enabled": true,
+    "PriceClass": "PriceClass_100"
+  }

@@ -1,5 +1,6 @@
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
+import { API_BASE_URL } from '../../../config/api';
 
 interface RecipeIngredient {
   name: string;
@@ -40,7 +41,7 @@ const AllRecipesPage = () => {
     const fetchRecipes = async () => {
       try {
         setLoading(true);
-        const response = await fetch("http://localhost:8000/recipes");
+        const response = await fetch(`${API_BASE_URL}/recipes`);
         const data = await response.json();
         setRecipes(data);
       } catch (error) {

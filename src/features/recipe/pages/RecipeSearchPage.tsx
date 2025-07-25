@@ -2,6 +2,7 @@ import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import type { RecipeSearchParams } from "../../../types/search";
 import type { Tag } from "../../../types/tag";
+import { API_BASE_URL } from '../../../config/api';
 
 interface RecipeIngredient {
   name: string;
@@ -72,7 +73,7 @@ const RecipeSearchPage = () => {
         params.append("sort_order", searchParams.sort_order);
       // console.log("Selected tags:", params.getAll("tag_ids"));
       const response = await fetch(
-        `http://localhost:8000/recipes/search?${params.toString()}`
+        `${API_BASE_URL}/recipes/search?${params.toString()}`
       );
       const data = await response.json();
       console.log("Search results:", data);
@@ -104,7 +105,7 @@ const RecipeSearchPage = () => {
   useEffect(() => {
     const fetchTags = async () => {
       try {
-        const response = await fetch("http://localhost:8000/tags");
+        const response = await fetch(`${API_BASE_URL}/tags`);
         const data = await response.json();
         setTags(data);
       } catch (error) {

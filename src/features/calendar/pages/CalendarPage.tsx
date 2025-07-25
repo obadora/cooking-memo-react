@@ -2,6 +2,7 @@
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import MonthlyCalendar from "../components/MonthlyCalendar";
+import { API_BASE_URL } from '../../../config/api';
 
 interface CookingRecordData {
   id?: number;
@@ -46,7 +47,7 @@ const CalendarPage = () => {
       //   `http://localhost:8000/cooking-records/month/${monthString}`
       // );
       // すべてのCookingRecordを取得するAPIエンドポイント
-      const response = await fetch(`http://localhost:8000/recipes`);
+      const response = await fetch(`${API_BASE_URL}/recipes`);
 
       if (response.ok) {
         const data = await response.json();

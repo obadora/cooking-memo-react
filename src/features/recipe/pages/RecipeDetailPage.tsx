@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
 import type { Tag } from "../../../types/tag";
+import { API_BASE_URL } from '../../../config/api';
 
 interface RecipeIngredient {
   name: string;
@@ -63,7 +64,7 @@ const RecipeDetailPage = () => {
   const fetchCookingDates = async (recipeId: number) => {
     try {
       const response = await fetch(
-        `http://localhost:8000/recipe/${recipeId}/cooking-dates`
+        `${API_BASE_URL}/recipe/${recipeId}/cooking-dates`
       );
       if (response.ok) {
         const data = await response.json();
@@ -78,7 +79,7 @@ const RecipeDetailPage = () => {
 
   const fetchAvailableTags = async () => {
     try {
-      const response = await fetch("http://localhost:8000/tags");
+      const response = await fetch(`${API_BASE_URL}/tags`);
       if (response.ok) {
         const data = await response.json();
         setAvailableTags(data);
@@ -93,7 +94,7 @@ const RecipeDetailPage = () => {
 
     try {
       const response = await fetch(
-        `http://localhost:8000/recipe/${recipeData.id}/tag/${tagId}`,
+        `${API_BASE_URL}/recipe/${recipeData.id}/tag/${tagId}`,
         {
           method: "POST",
         }
@@ -117,7 +118,7 @@ const RecipeDetailPage = () => {
 
     try {
       const response = await fetch(
-        `http://localhost:8000/recipe/${recipeData.id}/tag/${tagId}`,
+        `${API_BASE_URL}/recipe/${recipeData.id}/tag/${tagId}`,
         {
           method: "DELETE",
         }
@@ -137,7 +138,7 @@ const RecipeDetailPage = () => {
     if (!tagInputValue.trim()) return;
 
     try {
-      const response = await fetch("http://localhost:8000/tag", {
+      const response = await fetch(`${API_BASE_URL}/tag`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -158,7 +159,7 @@ const RecipeDetailPage = () => {
     if (!newName.trim()) return;
 
     try {
-      const response = await fetch(`http://localhost:8000/tag/${tagId}`, {
+      const response = await fetch(`${API_BASE_URL}/tag/${tagId}`, {
         method: "PUT",
         headers: {
           "Content-Type": "application/json",
@@ -184,7 +185,7 @@ const RecipeDetailPage = () => {
 
   const deleteTag = async (tagId: number) => {
     try {
-      const response = await fetch(`http://localhost:8000/tag/${tagId}`, {
+      const response = await fetch(`${API_BASE_URL}/tag/${tagId}`, {
         method: "DELETE",
       });
       if (response.ok) {
@@ -222,7 +223,7 @@ const RecipeDetailPage = () => {
 
     try {
       const response = await fetch(
-        `http://localhost:8000/recipe/${recipeData.id}`,
+        `${API_BASE_URL}/recipe/${recipeData.id}`,
         {
           method: "DELETE",
         }

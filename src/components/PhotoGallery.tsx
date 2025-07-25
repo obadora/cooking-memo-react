@@ -1,5 +1,6 @@
 import { useState } from "react";
 import type { RecipePhotoResponse } from "../types/api";
+import { API_BASE_URL } from "../config/api";
 
 interface PhotoGalleryProps {
   photos: RecipePhotoResponse[];
@@ -63,7 +64,7 @@ const PhotoGallery: React.FC<PhotoGalleryProps> = ({
             onClick={() => handlePhotoClick(index)}
           >
             <img
-              src={`http://localhost:8000${photo.photo_url}`}
+              src={`${API_BASE_URL}${photo.photo_url}`}
               alt={photo.alt_text || `レシピ写真 ${index + 1}`}
               className="w-full h-24 object-cover rounded-lg shadow hover:shadow-md transition-shadow"
             />
@@ -77,7 +78,7 @@ const PhotoGallery: React.FC<PhotoGalleryProps> = ({
         <div className="fixed inset-0 bg-black bg-opacity-90 z-50 flex items-center justify-center">
           <div className="relative max-w-4xl max-h-[90vh] mx-4">
             <img
-              src={`http://localhost:8000${photos[selectedPhotoIndex].photo_url}`}
+              src={`${API_BASE_URL}${photos[selectedPhotoIndex].photo_url}`}
               alt={
                 photos[selectedPhotoIndex].alt_text ||
                 `レシピ写真 ${selectedPhotoIndex + 1}`

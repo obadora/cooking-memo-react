@@ -1,5 +1,6 @@
 import { useState, useRef } from "react";
 import type { RecipePhotoResponse } from "../types/api";
+import { API_BASE_URL } from "../config/api";
 
 interface PhotoUploadProps {
   recipeId: number;
@@ -47,7 +48,7 @@ const PhotoUpload: React.FC<PhotoUploadProps> = ({
       console.log("Uploading photo with FormData to new endpoint");
 
       const response = await fetch(
-        `http://localhost:8000/recipe/${recipeId}/cooking-record/${cookingRecordId}/photo/upload`,
+        `${API_BASE_URL}/recipe/${recipeId}/cooking-record/${cookingRecordId}/photo/upload`,
         {
           method: "POST",
           body: formData,

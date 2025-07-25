@@ -4,6 +4,7 @@ import type { Tag } from "../../../types/tag";
 import type { RecipePhotoResponse } from "../../../types/api";
 import PhotoUpload from "../../../components/PhotoUpload";
 import PhotoGallery from "../../../components/PhotoGallery";
+import { API_BASE_URL } from '../../../config/api';
 // import { Recipe } from "./types/recipe";
 
 interface RecipeIngredient {
@@ -78,7 +79,7 @@ const DailyRecipeDetailPage = () => {
 
       try {
         const response = await fetch(
-          `http://localhost:8000/recipe/${recipeData.id}/cooking-record/${matchingRecord.id}/photos`
+          `${API_BASE_URL}/recipe/${recipeData.id}/cooking-record/${matchingRecord.id}/photos`
         );
         if (response.ok) {
           const data = await response.json();
@@ -97,7 +98,7 @@ const DailyRecipeDetailPage = () => {
 
   const fetchAvailableTags = async () => {
     try {
-      const response = await fetch("http://localhost:8000/tags");
+      const response = await fetch(`${API_BASE_URL}/tags`);
       if (response.ok) {
         const data = await response.json();
         setAvailableTags(data);
@@ -119,7 +120,7 @@ const DailyRecipeDetailPage = () => {
 
   const handlePhotoDelete = async (photoId: number) => {
     try {
-      const response = await fetch(`http://localhost:8000/photo/${photoId}`, {
+      const response = await fetch(`${API_BASE_URL}/photo/${photoId}`, {
         method: "DELETE",
       });
 
@@ -143,7 +144,7 @@ const DailyRecipeDetailPage = () => {
 
     try {
       const response = await fetch(
-        `http://localhost:8000/recipe/${recipeData.id}/tag/${tagId}`,
+        `${API_BASE_URL}/recipe/${recipeData.id}/tag/${tagId}`,
         {
           method: "POST",
         }
@@ -167,7 +168,7 @@ const DailyRecipeDetailPage = () => {
 
     try {
       const response = await fetch(
-        `http://localhost:8000/recipe/${recipeData.id}/tag/${tagId}`,
+        `${API_BASE_URL}/recipe/${recipeData.id}/tag/${tagId}`,
         {
           method: "DELETE",
         }
@@ -187,7 +188,7 @@ const DailyRecipeDetailPage = () => {
     if (!tagInputValue.trim()) return;
 
     try {
-      const response = await fetch("http://localhost:8000/tag", {
+      const response = await fetch(`${API_BASE_URL}/tag`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -208,7 +209,7 @@ const DailyRecipeDetailPage = () => {
     if (!newName.trim()) return;
 
     try {
-      const response = await fetch(`http://localhost:8000/tag/${tagId}`, {
+      const response = await fetch(`${API_BASE_URL}/tag/${tagId}`, {
         method: "PUT",
         headers: {
           "Content-Type": "application/json",
@@ -234,7 +235,7 @@ const DailyRecipeDetailPage = () => {
 
   const deleteTag = async (tagId: number) => {
     try {
-      const response = await fetch(`http://localhost:8000/tag/${tagId}`, {
+      const response = await fetch(`${API_BASE_URL}/tag/${tagId}`, {
         method: "DELETE",
       });
       if (response.ok) {
@@ -264,7 +265,7 @@ const DailyRecipeDetailPage = () => {
 
     try {
       const response = await fetch(
-        `http://localhost:8000/recipe/record/${recipeData.id}/${date}`,
+        `${API_BASE_URL}/recipe/record/${recipeData.id}/${date}`,
         {
           method: "DELETE",
         }

@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
+import { API_BASE_URL } from "../../../config/api";
 // import { Recipe } from "./types/recipe";
 
 interface RecipeIngredient {
@@ -41,7 +42,7 @@ const DailyRecipesPage = () => {
     e.preventDefault();
     if (!inputUrl) return;
     try {
-      const response = await fetch("http://localhost:8000/recipe/scrape", {
+      const response = await fetch(`${API_BASE_URL}/recipe/scrape`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ source_url: inputUrl, cooking_date: date }),
@@ -80,7 +81,7 @@ const DailyRecipesPage = () => {
   const fetchRecipesForDate = async (cookingDate: string) => {
     try {
       const response = await fetch(
-        `http://localhost:8000/recipes/date/${cookingDate}`
+        `${API_BASE_URL}/recipes/date/${cookingDate}`
       );
       if (response.ok) {
         const data = await response.json();
